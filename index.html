@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<!-- saved from url=(0019)https://38-0-0.com/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Perfect Festival · Book the ultimate line-up</title>
+<meta name="description" content="Spin a genre &amp; era, draft an act, and build an 11-slot festival bill. Can your line-up sell out all 38 shows and go a perfect 38-0-0?">
+<link rel="canonical" href="https://theperfectfestival.example/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Perfect Festival">
+<meta property="og:title" content="The Perfect Festival · Book the ultimate line-up">
+<meta property="og:description" content="Spin a genre &amp; era, draft your bill, and find out if your line-up can sell out all 38 shows.">
+<meta property="og:url" content="https://theperfectfestival.example/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Perfect Festival">
+<meta name="twitter:description" content="Build a festival line-up and chase a perfect 38-0-0 sold-out tour.">
+<meta name="theme-color" content="#0a0a12">
+<link rel="icon" type="image/svg+xml" href="./index_files/logo.svg">
+<link rel="apple-touch-icon" href="./index_files/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./index_files/styles.css">
+<script>
+  // Remove any stale service worker / caches left by the previous occupant of this
+  // domain (GoDaddy's "coming soon" PWA), so visitors aren't served the old page.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations()
+      .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); })
+      .catch(function () {});
+  }
+  if (window.caches && caches.keys) {
+    caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); })
+      .catch(function () {});
+  }
+</script>
+</head>
+<body>
+  <!-- App-download banner — website only, dismissible. Hidden inside the native app
+       (which loads this same file) and shown only to iOS visitors who can install it. -->
+  <div class="appbanner hidden" id="appBanner" role="complementary" aria-label="Get the app">
+    <button class="appbanner-x" id="appBannerX" aria-label="Dismiss">×</button>
+    <img class="appbanner-icon" src="./index_files/logo.svg" alt="">
+    <div class="appbanner-txt">
+      <strong>The Perfect Festival</strong>
+      <span>Build a line-up, chase a sold-out tour</span>
+    </div>
+    <a class="appbanner-cta" id="appBannerCta" href="#" rel="noopener">PLAY</a>
+  </div>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="./index_files/logo.svg" alt="38-0-0">
+      <span class="brand-sub">Book the perfect line-up</span>
+    </div>
+    <div class="round-pill" id="roundPill">Slot 1 / 11</div>
+    <button class="icon-btn" id="gamesBtn" title="Choose game">⇄</button>
+    <button class="icon-btn" id="resetBtn" title="Start over">↺</button>
+  </header>
+
+  <!-- Game chooser — shown ONLY inside the native app; hidden on the website -->
+  <div class="mode-chooser hidden" id="modeChooser">
+    <div class="mc-inner">
+      <img class="mc-logo" src="./index_files/logo.svg" alt="38-0-0">
+      <h1 class="mc-title">Choose your game</h1>
+      <div class="mc-grid">
+        <button class="mc-card mc-pvp" id="mcPvp">
+          <span class="mc-flag">⚔️</span>
+          <span class="mc-name">PvP</span>
+          <span class="mc-tag">beta</span>
+          <span class="mc-desc">Draft head to head against a player worldwide</span>
+        </button>
+        <button class="mc-card mc-epl" id="mcEpl">
+          <span class="mc-flag">🎪</span>
+          <span class="mc-name">Festival</span>
+          <span class="mc-desc">Book a perfect 38-0-0 line-up</span>
+        </button>
+        <button class="mc-card mc-laliga hidden" id="mcLaliga">
+          <span class="mc-flag">🇪🇸</span>
+          <span class="mc-name">Primera División</span>
+          <span class="mc-desc">Build a 38-0-0 Spanish League season</span>
+        </button>
+        <button class="mc-card mc-wc" id="mcWc">
+          <span class="mc-flag">🌍</span>
+          <span class="mc-name">Nations Cup</span>
+          <span class="mc-desc">Draft a squad and chase the trophy</span>
+        </button>
+        <button class="mc-card mc-ec" id="mcEc">
+          <span class="mc-flag">🇪🇺</span>
+          <span class="mc-name">European League</span>
+          <span class="mc-desc">Draft Europe's elite and win it all</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP SCREEN (mode + formation, before the first spin) -->
+  <section class="setup" id="setupScreen">
+    <div class="setup-inner">
+      <img class="setup-logo" src="./index_files/logo.svg" alt="38-0-0">
+      <h1 class="setup-title">Book your line-up</h1>
+      <p class="setup-sub">Pick how you play, choose your billing, then spin for 11 acts.</p>
+
+      <!-- Nations Cup cross-promo — revealed by JS for non-iOS web only (see script at end of body) -->
+      <a class="nc-promo" id="ncPromo" href="#">🎶 New: <b>three billings</b> →</a>
+
+      <div class="setup-step" id="setupModeStep">
+        <div class="setup-step-label">1 · Choose your mode</div>
+        <div class="mode-grid">
+          <button class="mode-card" data-mode="classic">
+            <span class="mode-name">Classic</span>
+            <span class="mode-desc">Full stats &amp; draw scores on show. Book the strongest bill you can.</span>
+          </button>
+          <button class="mode-card" data-mode="expert">
+            <span class="mode-name">Expert</span>
+            <span class="mode-desc">Scores &amp; stats hidden — only names &amp; genres. For real music heads.</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setup-step hidden" id="setupFormationStep">
+        <div class="setup-step-label">2 · Choose your billing</div>
+        <div class="formation-grid" id="formationGrid"></div>
+      </div>
+
+      <button class="setup-start hidden" id="setupStart">Start booking →</button>
+    </div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <main class="game hidden" id="gameScreen">
+    <!-- LEFT: spin + draft -->
+    <section class="left-col">
+      <!-- Spin sub-screen -->
+      <div class="spin-pane" id="spinPane">
+        <div class="reels">
+          <div class="reel reel-team" id="reelTeam">
+            <span class="reel-label">GENRE</span>
+            <span class="reel-value" id="reelTeamVal">POP</span>
+          </div>
+          <div class="reel reel-year" id="reelYear">
+            <span class="reel-label">ERA</span>
+            <span class="reel-value" id="reelYearVal">2023</span>
+          </div>
+        </div>
+        <div class="reel-captions"><span>Genre</span><span>Era</span></div>
+        <button class="spin-btn" id="spinBtn">SPIN</button>
+        <p class="spin-hint" id="spinHint">Spin to draw a genre &amp; era, then draft an act.</p>
+      </div>
+
+      <!-- Draft sub-screen -->
+      <div class="draft-pane hidden" id="draftPane">
+        <div class="draft-head">
+          <div class="draft-title">
+            <span id="draftTeamName">Pop</span>
+            <span class="draft-year" id="draftYear">2023</span>
+          </div>
+          <input class="draft-search" id="draftSearch" placeholder="Search act…">
+        </div>
+        <div class="draft-subhead">
+          <span class="draft-instruct" id="draftInstruct">Pick an act for your bill</span>
+          <span class="draft-cols">
+            <i>ENE</i><i>HIT</i><i>MUS</i><i>SHW</i><i>LEG</i><i>CRD</i><i class="ov">PULL</i>
+          </span>
+        </div>
+        <button class="respin-btn hidden" id="respinBtn">🎬 Re-spin the genre (watch an ad)</button>
+        <div class="player-list" id="playerList"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: pitch -->
+    <section class="pitch-col">
+      <div class="pitch" id="pitch">
+        <div class="pitch-lines">
+          <div class="pl-box pl-box-top"></div>
+          <div class="pl-box pl-box-bottom"></div>
+          <div class="pl-circle"></div>
+          <div class="pl-halfway"></div>
+          <div class="pl-spot pl-spot-top"></div>
+          <div class="pl-spot pl-spot-bottom"></div>
+        </div>
+        <!-- slot nodes injected by JS -->
+      </div>
+      <div class="formation-tag" id="formationTag">4-3-3</div>
+    </section>
+  </main>
+
+  <!-- RESULTS SCREEN -->
+  <section class="results hidden" id="resultsScreen">
+    <div class="results-inner">
+      <img class="results-logo-img" src="./index_files/logo.svg" alt="The Perfect Festival">
+      <h1 class="results-q" id="resultsQ">Your line-up</h1>
+      <div class="poster" id="resultPoster"></div>
+      <div class="record-block hidden">
+        <span class="record-label">PROJECTED TOUR</span>
+        <div class="record-line">
+          <span class="rec-w" id="recW">0</span>
+          <span class="rec-sep">–</span>
+          <span class="rec-d" id="recD">0</span>
+          <span class="rec-sep">–</span>
+          <span class="rec-l" id="recL">0</span>
+        </div>
+        <div class="record-key"><b>Sold out</b> · <b>Half-full</b> · <b>Flopped</b> &nbsp;across 38 shows · <span id="recPts">0</span> hype</div>
+        <div class="tier-badge" id="tierBadge">CHAMPIONS</div>
+      </div>
+
+      <!-- Season recap: verdict + correspondent summary + key men -->
+      <div class="recap" id="recapBox">
+        <div class="recap-verdict met" id="recapVerdict">MET EXPECTATIONS</div>
+        <div class="recap-text" id="recapText"></div>
+        <div class="recap-grid">
+          <div class="recap-item"><span class="recap-k">⭐ Act of the festival</span><span class="recap-v" id="recapStar"></span></div>
+          <div class="recap-item"><span class="recap-k">🎤 Biggest crowd</span><span class="recap-v" id="recapScorer"></span></div>
+        </div>
+      </div>
+
+      <!-- Expert-mode draft scorecard (single-player only); filled by draft-analysis.js -->
+      <div class="draft-analysis hidden" id="draftAnalysis"></div>
+
+      <div class="quad-banner hidden" id="quadBanner">
+        <span class="quad-title">🏆 THE GRAND SLAM 🏆</span>
+        <span class="quad-sub">Top billing + all three extras. The rarest result in the game.</span>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn-primary" id="shareBtn">Share result</button>
+        <button class="btn-ghost" id="againBtn">Build another</button>
+      </div>
+      <div class="iap-row hidden" id="iapRow">
+        <button class="btn-noads" id="removeAdsBtn">Remove ads</button>
+        <button class="iap-restore" id="restoreBtn">Restore purchase</button>
+      </div>
+      <div class="results-ad hidden" id="resultsAd"></div>
+
+      <button class="btn-showmore" id="showMoreBtn">Show full tour breakdown ▾</button>
+      <div class="breakdown hidden" id="breakdown">
+        <div class="bd-grid">
+          <div class="bd-card">
+            <div class="bd-label">Final billing</div>
+            <div class="bd-value" id="bdPosition">—</div>
+          </div>
+          <div class="bd-card">
+            <div class="bd-label">Act of the festival</div>
+            <div class="bd-value bd-sm" id="bdTopPlayer">—</div>
+            <div class="bd-sub" id="bdTopPlayerSub"></div>
+          </div>
+          <div class="bd-card">
+            <div class="bd-label">Biggest crowd</div>
+            <div class="bd-value bd-sm" id="bdTopScorer">—</div>
+            <div class="bd-sub" id="bdTopScorerSub"></div>
+          </div>
+        </div>
+
+        <div class="bd-honours">
+          <span class="bd-honours-label">Extras won this weekend</span>
+          <div class="bd-cups" id="bdCups"></div>
+        </div>
+
+        <div class="bd-players-label">Your line-up</div>
+        <div class="xi-list" id="xiList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / How it works / FAQ — real page content (SEO + ad-network review) -->
+  <section class="about" id="about">
+    <div class="about-inner">
+      <h2>About The Perfect Festival</h2>
+      <p><strong>The Perfect Festival</strong> is a free booking game. You build an 11-stage festival
+        line-up — three headliners and a full undercard across all five genres — and find out how strong
+        your bill really is. Spin a genre and an era, draft one act at a time, and the game projects your
+        line-up into a <strong>festival score</strong> and a touring run. Book a bill good enough and every
+        single night sells out: a flawless, sold-out tour.</p>
+
+      <h3>How it works</h3>
+      <ol>
+        <li><strong>Pick your mode and billing</strong> — Classic or Expert, and the shape of your weekend.</li>
+        <li><strong>Spin</strong> to draw a random genre and era.</li>
+        <li><strong>Draft one act</strong> from that pool onto an open stage.</li>
+        <li><strong>Fill all 11 stages</strong> until the poster is complete.</li>
+        <li><strong>Get your festival score &amp; tour</strong> — and the tier your bill earns, from an
+          Open-Mic Night up to the legendary Perfect Festival.</li>
+      </ol>
+
+      <h3>The sold-out tour</h3>
+      <p>The ultimate result is a bill so strong that it sells out every date of the tour. It is achievable
+        but deliberately rare: you need crowd-pulling acts on every stage, real range across genres, and a
+        little luck. Most line-ups land somewhere between a mid-bill weekend and a main-stage triumph.</p>
+
+      <h3>Stages &amp; billings</h3>
+      <p>Each act fills a stage it genuinely fits — a house DJ slots into the dance tent, a crossover star can
+        cover more than one stage. Build in one of three billings: <strong>Balanced Weekend</strong>,
+        <strong>Dance-Forward</strong> or <strong>Rock-Heavy</strong>. A line-up with genuine genre range
+        scores a little higher than a one-note bill, so the strongest festivals mix it up.</p>
+
+      <h3>Game modes</h3>
+      <ul>
+        <li><strong>Classic</strong> — full draw scores and act stats are on show. Book the strongest bill you can.</li>
+        <li><strong>Expert</strong> — scores and stats are hidden; you draft on names and genres alone. The
+          numbers, tiers and final tour are revealed at the end.</li>
+      </ul>
+
+      <h3>Frequently asked questions</h3>
+      <div class="faq">
+        <div class="faq-q">Is The Perfect Festival free to play?</div>
+        <div class="faq-a">Yes — it is completely free and runs in your browser. There is nothing to download.</div>
+        <div class="faq-q">Which acts and eras can I draw?</div>
+        <div class="faq-a">A curated pool of acts across pop, rock and indie, electronic, hip-hop and R&amp;B, spanning several eras, each with a draw score.</div>
+        <div class="faq-q">Can you really sell out the whole tour?</div>
+        <div class="faq-a">Yes, but it is rare. You need top acts on every stage and a bill with genuine range. Most bills land between a mid-bill weekend and a main-stage finish.</div>
+        <div class="faq-q">How is my festival score worked out?</div>
+        <div class="faq-a">It is based on the average draw power of your line-up, plus a small bonus for spanning more genres, with a little night-to-night variation on the tour.</div>
+        <div class="faq-q">Do I need an account?</div>
+        <div class="faq-a">No sign-up and no app needed — just spin and book.</div>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"Is The Perfect Festival free to play?","acceptedAnswer":{"@type":"Answer","text":"Yes - it is completely free and runs in your browser. There is nothing to download."}},
+      {"@type":"Question","name":"Which acts and eras can I draw?","acceptedAnswer":{"@type":"Answer","text":"A curated pool of acts across pop, rock, electronic, hip-hop and R&B, spanning several eras, each with a draw score."}},
+      {"@type":"Question","name":"Can you really go 38-0-0?","acceptedAnswer":{"@type":"Answer","text":"Yes, but it is rare. You need top acts in every slot and a bill with genuine genre range."}},
+      {"@type":"Question","name":"How is my tour worked out?","acceptedAnswer":{"@type":"Answer","text":"Your projected 38-show tour is based on the average draw score of your line-up, plus a small genre-range bonus and a little swing."}},
+      {"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No sign-up and no app needed - just spin and book."}}
+    ]
+  }
+  </script>
+
+  <footer class="site-footer">
+    <a href="#">Home</a>
+    &nbsp;·&nbsp; <a href="#about">How to Play</a>
+    &nbsp;·&nbsp; <a href="#about">About</a>
+    <span id="footerRestoreWrap" class="hidden">&nbsp;·&nbsp; <a href="https://38-0-0.com/#" id="footerRestore">Restore purchases</a></span>
+    <div class="footer-disclaimer">The Perfect Festival is an unofficial fan game for entertainment only, not affiliated with any artist, label or festival. Act draw scores are illustrative, not official.</div>
+  </footer>
+
+  <!-- Free internal analytics beacon (live users / DAU / countries).
+       Cookieless: sends only a random per-tab session id; uniques & geo are
+       derived server-side. No-op until STATS_URL is set to your Worker URL. -->
+  <script>
+  (function () {
+    var STATS_URL = ''; // retired — analytics now via Cloudflare Web Analytics (free, unlimited)
+    if (!STATS_URL) return;
+    var sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    function beat() {
+      try { navigator.sendBeacon(STATS_URL + '/api/beat', JSON.stringify({ sid: sid })); } catch (e) {}
+    }
+    beat();
+    setInterval(beat, 25000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) beat(); });
+  })();
+  </script>
+
+  <script src="./index_files/native.js"></script>
+  <script src="./index_files/iap.js"></script>
+  <script src="./index_files/saved.js"></script>
+  <script src="./index_files/draft-analysis.js"></script>
+  <script src="./index_files/app.js"></script>
+
+  <!-- App-download banner. Shows on the WEBSITE only, to iOS and Android visitors, once until dismissed. -->
+  <script>
+  (function () {
+    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    if (isNative) return;                                  // never inside the app
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS reports as Mac
+    var isAndroid = /Android/.test(ua);
+    // Country-agnostic links. Each store auto-redirects to the visitor's local storefront.
+    var url, device;
+    if (isIOS)          { url = 'https://apps.apple.com/app/id6776756035'; device = 'iPhone'; }
+    else if (isAndroid) { url = 'https://play.google.com/store/apps/details?id=com.sancarmedia.go380'; device = 'Android'; }
+    else return;                                           // desktop: no app banner (gets the cross-promo instead)
+    try { if (localStorage.getItem('appbanner_dismissed')) return; } catch (e) {}
+    var b = document.getElementById('appBanner');
+    if (!b) return;
+    var strong = b.querySelector('.appbanner-txt strong');
+    if (strong) strong.textContent = 'Get 38-0-0 free on ' + device;
+    document.getElementById('appBannerCta').href = url;
+    b.classList.remove('hidden');
+    document.getElementById('appBannerX').addEventListener('click', function () {
+      b.classList.add('hidden');
+      try { localStorage.setItem('appbanner_dismissed', '1'); } catch (e) {}
+    });
+  })();
+  </script>
+
+  <!-- Game chooser logic — runs on web AND in the app. The app shows the chooser on
+       launch; the web lands straight in the EPL game but exposes the ⇄ button so visitors
+       can switch to Nations Cup (and back). Both games live on 38-0-0.com. -->
+  <script>
+  (function () {
+    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
+    // Deep link: an invite (38-0-0.com/pvp?join=CODE) cold-launches the app onto THIS page, so route
+    // it into PvP's join flow by handing the code to the PvP page via its own ?join= query. Warm opens
+    // while already inside PvP are handled by pvp.js. getLaunchUrl is guarded with sessionStorage so
+    // returning Home later in the same app session does not re-trap the user back into PvP.
+    if (isNative && window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.App) {
+      var DApp = Capacitor.Plugins.App;
+      var parseJoin = function (url) {
+        if (!url) return '';
+        try { var qi = url.indexOf('?'); var q = qi >= 0 ? url.slice(qi + 1) : '';
+          return (new URLSearchParams(q).get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); }
+        catch (e) { return ''; }
+      };
+      DApp.addListener('appUrlOpen', function (d) { var c = parseJoin(d && d.url); if (c) location.href = 'pvp/index.html?join=' + c; });
+      if (DApp.getLaunchUrl) DApp.getLaunchUrl().then(function (r) {
+        var c = parseJoin(r && r.url);
+        if (c && !sessionStorage.getItem('pvp_djoin')) { try { sessionStorage.setItem('pvp_djoin', '1'); } catch (e) {} location.href = 'pvp/index.html?join=' + c; }
+      }).catch(function () {});
+    }
+
+    var chooser = document.getElementById('modeChooser');
+    if (!chooser) return;
+    function lock(on) { document.documentElement.classList.toggle('chooser-open', on); document.body.classList.toggle('chooser-open', on); }
+    function show() { chooser.classList.remove('hidden'); lock(true); }
+    function hide() { chooser.classList.add('hidden'); lock(false); }
+    if (isNative || location.hash === '#games') { show(); if (history.replaceState) history.replaceState(null, '', location.pathname); }   // app: choose on launch; web: ⇄ from any mode opens the chooser here
+    var pvp = document.getElementById('mcPvp');
+    if (pvp) pvp.addEventListener('click', function () {
+      if (isNative) { location.href = 'pvp/index.html'; return; }   // in the app: open PvP
+      showPvpAppGate();                                             // on the web: PvP is app-only for now, drive downloads
+    });
+    document.getElementById('mcEpl').addEventListener('click', hide);
+    var laligaCard = document.getElementById('mcLaliga');
+    laligaCard.addEventListener('click', function () { location.href = 'laliga/index.html'; });
+    if (!isNative) laligaCard.classList.add('hidden');                  // La Liga / Primera Division is app-only on the web for now
+    document.getElementById('mcWc').addEventListener('click', function () { location.href = 'nationscup/index.html'; });
+    document.getElementById('mcEc').addEventListener('click', function () { location.href = 'europeanleague/index.html'; });
+    var g = document.getElementById('gamesBtn');
+    if (g) { g.classList.remove('hidden'); g.addEventListener('click', show); }
+    var promo = document.getElementById('ncPromo');
+    if (promo) promo.addEventListener('click', function (e) { e.preventDefault(); show(); });   // "New PvP mode" promo opens the games menu
+
+    // PvP is app-only on the web for now (until the site is monetized). The card stays, but on the
+    // web a tap shows a download prompt with both store links instead of opening PvP, to drive installs.
+    function showPvpAppGate() {
+      var existing = document.getElementById('pvpAppGate');
+      if (existing) { existing.classList.remove('hidden'); return; }
+      if (!document.getElementById('pvpAppGateCSS')) {
+        var st = document.createElement('style'); st.id = 'pvpAppGateCSS';
+        st.textContent = '.pvpgate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,6,12,.82)}'
+          + '.pvpgate.hidden{display:none}'
+          + '.pvpgate-box{width:100%;max-width:380px;background:#12121f;border:1px solid #23233a;border-radius:18px;padding:26px 22px;text-align:center;color:#e9e9f2;font-family:Inter,system-ui,sans-serif}'
+          + '.pvpgate-box .em{font-size:42px;line-height:1;margin-bottom:6px}'
+          + '.pvpgate-box h3{margin:0 0 8px;font-size:21px;font-weight:900}'
+          + '.pvpgate-box p{margin:0 0 18px;color:#8a8aa3;font-size:14px;line-height:1.55}'
+          + '.pvpgate-box a.store{display:flex;align-items:center;justify-content:center;width:100%;padding:13px 16px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;margin-bottom:10px}'
+          + '.pvpgate-box a.ios{background:#fff;color:#000}'
+          + '.pvpgate-box a.android{background:linear-gradient(90deg,#ff2e7e,#7b2ff7 55%,#13d4c4);color:#fff}'
+          + '.pvpgate-box .close{margin-top:4px;background:none;border:none;color:#8a8aa3;font-weight:700;font-size:13px;cursor:pointer}';
+        document.head.appendChild(st);
+      }
+      var box = document.createElement('div');
+      box.id = 'pvpAppGate'; box.className = 'pvpgate';
+      box.innerHTML = '<div class="pvpgate-box">'
+        + '<div class="em">⚔️</div>'
+        + '<h3>PvP is on the app</h3>'
+        + '<p>PvP is currently only available in the 38-0-0 app. Download it free to draft head to head against players worldwide.</p>'
+        + '<a class="store ios" href="https://apps.apple.com/app/id6776756035" target="_blank" rel="noopener">Download on the App Store</a>'
+        + '<a class="store android" href="https://play.google.com/store/apps/details?id=com.sancarmedia.go380" target="_blank" rel="noopener">Get it on Google Play</a>'
+        + '<button class="close" type="button">Maybe later</button>'
+        + '</div>';
+      box.addEventListener('click', function (e) { if (e.target === box) box.classList.add('hidden'); });
+      box.querySelector('.close').addEventListener('click', function () { box.classList.add('hidden'); });
+      document.body.appendChild(box);
+    }
+  })();
+  </script>
+
+  <!-- Nations Cup cross-promo. Shows to desktop web visitors only. Hidden in the native app
+       (the chooser handles modes there) and on mobile web (iOS and Android get the app-download
+       banner instead, so we don't show a second competing CTA). -->
+  <script>
+  (function () {
+    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isAndroid = /Android/.test(ua);
+    if (isNative || isIOS || isAndroid) return;
+    var p = document.getElementById('ncPromo');
+    if (p) p.classList.remove('hidden');
+  })();
+  </script>
+
+
+
+<protonpass-root-abc1 data-protonpass-role="root" data-protonpass-theme="os"><template shadowrootmode="closed"></template></protonpass-root-abc1></body></html>
