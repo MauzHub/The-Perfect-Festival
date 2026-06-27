@@ -206,7 +206,9 @@ function showSetup(){
   const st = $('setupStart'); if (st) st.classList.remove('hidden');
   window.scrollTo(0, 0);
 }
-function maybeShowStart(){ /* no-op: setup always shows start button */ }
+function maybeShowStart(){
+  $('setupStart').classList.toggle('hidden', !(setupMode && setupFormation));
+}
 function startGame(mode, formationKey){
   const f = FORMATIONS[formationKey] || FORMATIONS['main'];
   SLOTS = f.slots;
