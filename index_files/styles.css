@@ -673,3 +673,65 @@ body.mode-expert #gameScreen .slot-ov{display:none !important}
 .prow-cost{min-width:74px;font-size:15px}
 .budget-chip{font-size:14px}
 @media (max-width:560px){ .prow-cost{min-width:64px;font-size:13px} .budget-chip{font-size:12px;padding:6px 10px} }
+
+/* ============================================================
+   v5 — 12-slot poster, clearer budget, bigger desktop type
+   ============================================================ */
+
+/* highlight is glow-only (no scale) so nothing shifts when you select an act */
+.slot.open.armed .slot-node{
+  border-color:var(--accent3);border-style:solid;cursor:pointer;
+  box-shadow:0 0 0 3px rgba(19,212,196,.30),0 0 22px rgba(19,212,196,.55);
+  animation:glowpulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-50%)}}
+@keyframes glowpulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(19,212,196,.26),0 0 16px rgba(19,212,196,.45)}
+  50%{box-shadow:0 0 0 4px rgba(19,212,196,.40),0 0 28px rgba(19,212,196,.75)}
+}
+.slot[data-tier="1"].open.armed .slot-node{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(255,210,74,.30),0 0 22px rgba(255,210,74,.55);
+  animation:glowpulsegold 1.2s ease-in-out infinite;
+}
+@keyframes glowpulsegold{
+  0%,100%{box-shadow:0 0 0 3px rgba(255,210,74,.26),0 0 16px rgba(255,210,74,.45)}
+  50%{box-shadow:0 0 0 4px rgba(255,210,74,.42),0 0 30px rgba(255,210,74,.80)}
+}
+
+/* pitch: stable height, a little inner breathing room top & bottom */
+.pitch{padding:0;max-width:500px;height:min(70vh,580px)}
+.pitch-col{align-self:start}
+
+/* clearer budget chip with a progress bar */
+.budget-chip{flex-direction:column;align-items:stretch;gap:5px;padding:7px 14px;min-width:172px;
+  background:rgba(19,212,196,.08);border:1px solid rgba(19,212,196,.34)}
+.budget-chip .bc-row{display:flex;align-items:baseline;gap:7px;line-height:1}
+.budget-chip .bc-l{font-size:10px;letter-spacing:.18em;color:var(--accent3);font-family:'Inter',sans-serif;font-weight:800}
+.budget-chip .bc-amt{font-family:var(--disp);font-size:19px;color:#fff;letter-spacing:.02em}
+.budget-chip .bc-of{margin-left:auto;font-size:10px;color:var(--muted);font-family:'Inter',sans-serif;font-weight:700;white-space:nowrap}
+.budget-chip .bc-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.budget-chip .bc-bar>i{display:block;height:100%;width:0;border-radius:3px;
+  background:linear-gradient(90deg,#13d4c4,#7c3aed);transition:width .25s}
+.budget-chip.warn{border-color:rgba(255,196,74,.6);background:rgba(255,196,74,.1)}
+.budget-chip.warn .bc-amt{color:#ffd27a} .budget-chip.warn .bc-of{color:#ffc44a}
+.budget-chip.warn .bc-bar>i{background:linear-gradient(90deg,#ffd27a,#ff9d3d)}
+.budget-chip.low{border-color:rgba(255,84,112,.6);background:rgba(255,84,112,.12)}
+.budget-chip.low .bc-amt{color:#ff8da3} .budget-chip.low .bc-l{color:#ff8da3} .budget-chip.low .bc-of{color:#ff7088}
+.budget-chip.low .bc-bar>i{background:linear-gradient(90deg,#ff5470,#ff2d78)}
+
+/* bigger, more readable type on desktop (mobile stays as-is) */
+@media(min-width:901px){
+  .prow{padding:12px 18px}
+  .prow-name{font-size:17px}
+  .prow-meta,.prow-pos{font-size:12px}
+  .prow-cost{font-size:17px;min-width:84px}
+  .prow-ov{font-size:21px}
+  .draft-cols i{font-size:11px}
+  .draft-cols .cost{min-width:84px}
+  .draft-head{font-size:15px}
+  .draft-subhead,.draft-instruct{font-size:13px}
+  .draft-team-name{font-size:20px}
+  .draft-search input{font-size:14px}
+  .reel-value{font-size:46px}
+}

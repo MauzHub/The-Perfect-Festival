@@ -6,7 +6,7 @@
     formations->billings, a 38-game season->a 38-show tour.)
    ============================================================ */
 
-const TOTAL_ROUNDS = 11;
+const TOTAL_ROUNDS = 12;
 
 // Formations. Each slot carries x,y (% on a vertical pitch, GK bottom / attack top),
 // a display label, and a position FAMILY used for eligibility. Wing-backs (RWB/LWB)
@@ -16,17 +16,18 @@ const FORMATIONS = {
   // ONE billing. Stages are tiered by SIZE, not genre — any act can play any stage. Weight drives how
   // much a stage counts toward the score (headliners matter most). Laid out as a poster, top->bottom.
   'main': { name:'The Line-up', slots:[
-    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:24, y:15},
-    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:12},
-    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:76, y:15},
-    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:33, y:38},
-    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:67, y:38},
-    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:33, y:54},
-    {id:'M4', label:'Field',    fam:'ANY', tier:2, weight:1.0, x:67, y:54},
-    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:33, y:72},
-    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:67, y:72},
-    {id:'U3', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:33, y:88},
-    {id:'U4', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:67, y:88},
+    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:22, y:14},
+    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:14},
+    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:78, y:14},
+    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:22, y:38},
+    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:50, y:38},
+    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:78, y:38},
+    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:22, y:62},
+    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:50, y:62},
+    {id:'U3', label:'Field',    fam:'ANY', tier:3, weight:0.7, x:78, y:62},
+    {id:'U4', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:22, y:86},
+    {id:'U5', label:'Grove',    fam:'ANY', tier:3, weight:0.7, x:50, y:86},
+    {id:'U6', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:78, y:86},
   ]},
 };
 
@@ -173,7 +174,7 @@ function slotAccepts(slot, p){ return !!slot && !isNameUsed(p.n) && canAfford(p)
 function playerOpenSlots(p){ return isNameUsed(p.n) ? [] : openSlots(); }
 function isUsed(p){ return isNameUsed(p.n); }
 // ---- BOOKING BUDGET ----
-const BUDGET = 480;          // total to spend on the 11-act bill (calibrated)
+const BUDGET = 540;          // total to spend on the 12-act bill (calibrated)
 const RESERVE = 18;          // kept aside per still-open stage so you can always finish (no dead-ends)
 const MONEY_UNIT = 25000;   // display only: raw cost -> euro booking fee (budget 480 -> €12M)
 function fmtMoney(raw){
@@ -395,7 +396,7 @@ function spin(isRespin){
 /* ---------- donation popup ---------- */
 let spinCount = 0;
 let donationFirstShown = false;
-const KOFI_URL = 'https://ko-fi.com/38_0_0game';
+const KOFI_URL = '';  // donations disabled
 function showDonationModal(){ return; /* disabled */
   if (document.getElementById('donateModal')) return;
   const m = document.createElement('div');
@@ -404,8 +405,8 @@ function showDonationModal(){ return; /* disabled */
   m.innerHTML = `
     <div class="donate-card">
       <button class="donate-x" id="donateX" aria-label="Close">×</button>
-      <div class="donate-title">Help Us Go 38-0-0</div>
-      <p class="donate-body">Thanks for all the love for 38-0-0. Growth is amazing — but it also
+      <div class="donate-title">Support the game</div>
+      <p class="donate-body">Thanks for all the love. Growth is amazing — but it also
         means the costs to keep it online are piling up. If you want to help keep the game alive,
         ad-free, and independent, consider supporting the project on Ko-fi.</p>
       <div class="donate-actions">
@@ -433,7 +434,7 @@ function showSocialsModal(){ return; /* disabled */
   m.innerHTML = `
     <div class="donate-card">
       <button class="donate-x" id="socialsClose" aria-label="Close">×</button>
-      <div class="donate-title">Enjoying 38-0-0?</div>
+      <div class="donate-title">Enjoying the game?</div>
       <p class="donate-body">Follow my socials to keep up with updates — new genres, eras and
         features are on the way.</p>
       <div class="donate-actions">
@@ -619,10 +620,22 @@ function renderPlayerList(filter){
 }
 function stat(p, key){ const v = p[key]; return v > 0 ? v : '–'; }
 function updateBudgetUI(){
-  const el = document.getElementById('budgetChip'); if (!el) return;
-  const left = remaining();
-  el.innerHTML = `<span class="bc-l">BUDGET</span> ${fmtMoney(left)}<span class="bc-of"> / ${fmtMoney(state.budget||BUDGET)}</span>`;
-  el.classList.toggle("low", left <= 60);
+  const chip = document.getElementById('budgetChip'); if (!chip) return;
+  const bud = state.budget || BUDGET, left = remaining(), used = spent();
+  const amt = document.getElementById('bcAmt'); if (amt) amt.textContent = fmtMoney(left);
+  const fill = document.getElementById('bcFill'); if (fill) fill.style.width = Math.max(0, Math.min(100, 100 * used / bud)) + '%';
+  const slotsLeft = SLOTS.length - countPicks();
+  const of = document.getElementById('bcOf');
+  chip.classList.remove('warn', 'low');
+  if (slotsLeft > 0 && left <= slotsLeft * 10){        // only cheap acts left affordable
+    chip.classList.add('low');
+    if (of) of.textContent = '⚠ low — pick cheaper';
+  } else if (used / bud > countPicks() / SLOTS.length + 0.15){   // spending faster than booking
+    chip.classList.add('warn');
+    if (of) of.textContent = '⚠ spending fast';
+  } else if (of){
+    of.textContent = 'of ' + fmtMoney(bud);
+  }
 }
 
 function selectPlayer(idx){
@@ -642,28 +655,28 @@ function selectPlayer(idx){
 // Tightened top-tier thresholds (v2.1): a perfect / unbeaten / centurion season now needs a strong
 // rating AND a good season swing, not rating alone. Calibrated in scripts/calibrate_epl.py to
 // ~1 in 600 (38-0-0), ~1 in 50 (Invincibles), ~1 in 14 (Centurions) for a strong draft.
-const GOAT_T = 89.30, INV_T = 88.30, CENT_T = 87.30;   // perfect / legendary / headline-act floors (budget era)
-const B_CHAMP = 86.00, B_CL = 84.30, B_EUR = 82.30, B_MID = 79.80;   // headliners / main-stage / big-top / mid-bill bands
+const GOAT_T = 89.70, INV_T = 88.70, CENT_T = 87.70;   // perfect / legendary / headline-act floors (budget era)
+const B_CHAMP = 86.40, B_CL = 84.70, B_EUR = 82.70, B_MID = 80.20;   // headliners / main-stage / big-top / mid-bill bands
 const SEASON_VAR = 3.0;   // season swing multiplier (a league is more predictable than a cup)
 
 // Rating -> (W,D) anchors. Records interpolate between these; L = 38 - W - D.
 // Tuned so badge bands (by rating) line up with believable season records.
 const RECORD_ANCHORS = [
   // festival score -> internal (W,D) used only for the over/under-performance verdict flavour.
-  // Rescaled to the budget-era achievable range (~76–89.3).
+  // Rescaled to the budget-era achievable range (~76–89.7).
   [74.0,   1,  3],
   [76.5,   3,  5],
   [78.5,   5,  8],
-  [80.5,   8,  9],
-  [82.3,  12, 11],   // big-top floor
-  [84.3,  16, 10],   // main-stage floor
-  [85.2,  19, 10],
+  [80.2,   8,  9],
+  [82.7,  12, 11],   // big-top floor
+  [84.7,  16, 10],   // main-stage floor
+  [85.5,  19, 10],
   [B_CHAMP,22,  9],  // headliners floor
-  [87.0,  26,  8],
+  [87.2,  26,  8],
   [CENT_T, 30,  6],  // headline-act floor
-  [88.0,  33,  4],
+  [88.2,  33,  4],
   [INV_T,  35,  3],  // legendary floor
-  [89.0,  37,  1],
+  [89.2,  37,  1],
   [GOAT_T, 38,  0],  // perfect festival
 ];
 function recordFromRating(S){
@@ -998,16 +1011,18 @@ function renderResultPoster(r){
   const hl = (byTier[1] || []).map(row =>
     `<div class="ph"><span class="ph-day">${esc(row.slot.label)}</span>` +
     `<span class="ph-act">${esc(row.pick.player.n)}</span></div>`).join('');
-  const rowHtml = (t, cls) => {
-    const acts = (byTier[t] || []).map(row => esc(row.pick.player.n));
-    return acts.length ? `<div class="pr ${cls}">${acts.join('<span class="dot">/</span>')}</div>` : '';
-  };
+  const lineOf = (acts, cls) => acts.length
+    ? `<div class="pr ${cls}">${acts.map(esc).join('<span class="dot">/</span>')}</div>` : '';
+  const main = (byTier[2] || []).map(row => row.pick.player.n);
+  const under = (byTier[3] || []).map(row => row.pick.player.n);
+  const half = Math.ceil(under.length / 2);
+  const body = lineOf(main, 'pr-a') + lineOf(under.slice(0, half), 'pr-b') + lineOf(under.slice(half), 'pr-c');
   const billing = (FORMATIONS[state.formation] || {}).name || '';
   return `
     <div class="poster-kicker">THE PERFECT FESTIVAL · EST. 2026</div>
-    <div class="poster-sub-top">${esc(billing)} · 3 DAYS · 11 STAGES</div>
+    <div class="poster-sub-top">${esc(billing)} · 3 DAYS · 12 STAGES</div>
     <div class="poster-headliners">${hl}</div>
-    <div class="poster-body">${rowHtml(2,'pr-a')}${rowHtml(3,'pr-b')}${rowHtml(4,'pr-c')}${rowHtml(5,'pr-d')}</div>
+    <div class="poster-body">${body}</div>
     <div class="poster-foot">
       <span class="poster-tier" style="background:${tier.color}">${tier.name}</span>
       <span class="poster-score">${r.S}<small>festival score</small></span>
@@ -1360,13 +1375,17 @@ function buildShareCanvas(){
     ctx.fillText(row.pick.player.n, cx, y); y += 64;
   });
   y += 6;
-  const drawRow = (t, size, col) => {
-    const acts = (byTier[t] || []).map(rw => rw.pick.player.n);
+  const drawLine = (acts, size, col) => {
     if (!acts.length) return;
     ctx.fillStyle = col; ctx.font = `400 ${size}px "Bebas Neue", Inter, sans-serif`;
     ctx.fillText(acts.join('   /   '), cx, y); y += size + 14;
   };
-  drawRow(2, 34, '#f3f0fb'); drawRow(3, 29, '#d9d4ea'); drawRow(4, 25, '#c2bcd6'); drawRow(5, 22, '#a59fbd');
+  const main = (byTier[2] || []).map(rw => rw.pick.player.n);
+  const under = (byTier[3] || []).map(rw => rw.pick.player.n);
+  const half = Math.ceil(under.length / 2);
+  drawLine(main, 34, '#f3f0fb');
+  drawLine(under.slice(0, half), 26, '#d9d4ea');
+  drawLine(under.slice(half), 24, '#c2bcd6');
 
   // footer
   ctx.fillStyle='#8a8aa3'; ctx.font='800 30px Inter, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';

@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<!-- saved from url=(0019)https://38-0-0.com/ -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Perfect Festival · Book the ultimate line-up</title>
-<meta name="description" content="Spin a genre &amp; era, draft an act, and build an 11-slot festival bill. Can your line-up sell out all 38 shows and go a perfect 38-0-0?">
+<meta name="description" content="The Perfect Festival — spin a real festival, draft acts on a fixed budget, and build a line-up across 12 stages. Chase the perfect festival.">
 <link rel="canonical" href="https://theperfectfestival.example/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Perfect Festival">
 <meta property="og:title" content="The Perfect Festival · Book the ultimate line-up">
-<meta property="og:description" content="Spin a genre &amp; era, draft your bill, and find out if your line-up can sell out all 38 shows.">
+<meta property="og:description" content="Spin a real festival, draft acts on a budget, and build the perfect 12-stage line-up.">
 <meta property="og:url" content="https://theperfectfestival.example/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Perfect Festival">
-<meta name="twitter:description" content="Build a festival line-up and chase a perfect 38-0-0 sold-out tour.">
+<meta name="twitter:description" content="Build the perfect festival line-up on a fixed budget.">
 <meta name="theme-color" content="#0a0a12">
 <link rel="icon" type="image/svg+xml" href="./index_files/logo.svg">
 <link rel="apple-touch-icon" href="./index_files/logo.svg">
@@ -35,26 +34,18 @@
 </script>
 </head>
 <body>
-  <!-- App-download banner — website only, dismissible. Hidden inside the native app
-       (which loads this same file) and shown only to iOS visitors who can install it. -->
-  <div class="appbanner hidden" id="appBanner" role="complementary" aria-label="Get the app">
-    <button class="appbanner-x" id="appBannerX" aria-label="Dismiss">×</button>
-    <img class="appbanner-icon" src="./index_files/logo.svg" alt="">
-    <div class="appbanner-txt">
-      <strong>The Perfect Festival</strong>
-      <span>Build a line-up, chase a sold-out tour</span>
-    </div>
-    <a class="appbanner-cta" id="appBannerCta" href="#" rel="noopener">PLAY</a>
-  </div>
 
   <!-- Top bar -->
   <header class="topbar">
     <div class="brand">
-      <img class="brand-logo" src="./index_files/logo.svg" alt="38-0-0">
+      <img class="brand-logo" src="./index_files/logo.svg" alt="The Perfect Festival">
       <span class="brand-sub">Book the perfect line-up</span>
     </div>
-    <div class="budget-chip" id="budgetChip"><span class="bc-l">BUDGET</span> €12M</div>
-    <div class="round-pill" id="roundPill">Slot 1 / 11</div>
+    <div class="budget-chip" id="budgetChip">
+      <div class="bc-row"><span class="bc-l">LEFT</span><span class="bc-amt" id="bcAmt">€13.5M</span><span class="bc-of" id="bcOf">of €13.5M</span></div>
+      <div class="bc-bar"><i id="bcFill"></i></div>
+    </div>
+    <div class="round-pill" id="roundPill">Round 1 / 12</div>
     <button class="icon-btn" id="gamesBtn" title="Choose game">⇄</button>
     <button class="icon-btn" id="resetBtn" title="Start over">↺</button>
   </header>
@@ -150,7 +141,7 @@
           <span class="rec-sep">–</span>
           <span class="rec-l" id="recL">0</span>
         </div>
-        <div class="record-key"><b>Sold out</b> · <b>Half-full</b> · <b>Flopped</b> &nbsp;across 38 shows · <span id="recPts">0</span> hype</div>
+        <div class="record-key"><span id="recPts">0</span></div>
         <div class="tier-badge" id="tierBadge">CHAMPIONS</div>
       </div>
 
@@ -274,8 +265,8 @@
     "mainEntity": [
       {"@type":"Question","name":"Is The Perfect Festival free to play?","acceptedAnswer":{"@type":"Answer","text":"Yes - it is completely free and runs in your browser. There is nothing to download."}},
       {"@type":"Question","name":"Which acts and eras can I draw?","acceptedAnswer":{"@type":"Answer","text":"A curated pool of acts across pop, rock, electronic, hip-hop and R&B, spanning several eras, each with a draw score."}},
-      {"@type":"Question","name":"Can you really go 38-0-0?","acceptedAnswer":{"@type":"Answer","text":"Yes, but it is rare. You need top acts in every slot and a bill with genuine genre range."}},
-      {"@type":"Question","name":"How is my tour worked out?","acceptedAnswer":{"@type":"Answer","text":"Your projected 38-show tour is based on the average draw score of your line-up, plus a small genre-range bonus and a little swing."}},
+      {"@type":"Question","name":"Can you really book the perfect festival?","acceptedAnswer":{"@type":"Answer","text":"Yes, but it is rare. You need top acts headlining, real range across the bill, and shrewd use of your budget."}},
+      {"@type":"Question","name":"How is my festival score worked out?","acceptedAnswer":{"@type":"Answer","text":"It is a weighted average of your acts\u2019 draw power \u2014 headliners count most \u2014 plus a small bonus for genre range."}},
       {"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No sign-up and no app needed - just spin and book."}}
     ]
   }
@@ -285,7 +276,7 @@
     <a href="#">Home</a>
     &nbsp;·&nbsp; <a href="#about">How to Play</a>
     &nbsp;·&nbsp; <a href="#about">About</a>
-    <span id="footerRestoreWrap" class="hidden">&nbsp;·&nbsp; <a href="https://38-0-0.com/#" id="footerRestore">Restore purchases</a></span>
+    
     <div class="footer-disclaimer">The Perfect Festival is an unofficial fan game for entertainment only, not affiliated with any artist, label or festival. Act draw scores are illustrative, not official.</div>
   </footer>
 
@@ -312,132 +303,8 @@
   <script src="./index_files/draft-analysis.js"></script>
   <script src="./index_files/app.js"></script>
 
-  <!-- App-download banner. Shows on the WEBSITE only, to iOS and Android visitors, once until dismissed. -->
-  <script>
-  (function () {
-    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-    if (isNative) return;                                  // never inside the app
-    var ua = navigator.userAgent || '';
-    var isIOS = /iPad|iPhone|iPod/.test(ua) ||
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS reports as Mac
-    var isAndroid = /Android/.test(ua);
-    // Country-agnostic links. Each store auto-redirects to the visitor's local storefront.
-    var url, device;
-    if (isIOS)          { url = 'https://apps.apple.com/app/id6776756035'; device = 'iPhone'; }
-    else if (isAndroid) { url = 'https://play.google.com/store/apps/details?id=com.sancarmedia.go380'; device = 'Android'; }
-    else return;                                           // desktop: no app banner (gets the cross-promo instead)
-    try { if (localStorage.getItem('appbanner_dismissed')) return; } catch (e) {}
-    var b = document.getElementById('appBanner');
-    if (!b) return;
-    var strong = b.querySelector('.appbanner-txt strong');
-    if (strong) strong.textContent = 'Get 38-0-0 free on ' + device;
-    document.getElementById('appBannerCta').href = url;
-    b.classList.remove('hidden');
-    document.getElementById('appBannerX').addEventListener('click', function () {
-      b.classList.add('hidden');
-      try { localStorage.setItem('appbanner_dismissed', '1'); } catch (e) {}
-    });
-  })();
-  </script>
 
-  <!-- Game chooser logic — runs on web AND in the app. The app shows the chooser on
-       launch; the web lands straight in the EPL game but exposes the ⇄ button so visitors
-       can switch to Nations Cup (and back). Both games live on 38-0-0.com. -->
-  <script>
-  (function () {
-    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 
-    // Deep link: an invite (38-0-0.com/pvp?join=CODE) cold-launches the app onto THIS page, so route
-    // it into PvP's join flow by handing the code to the PvP page via its own ?join= query. Warm opens
-    // while already inside PvP are handled by pvp.js. getLaunchUrl is guarded with sessionStorage so
-    // returning Home later in the same app session does not re-trap the user back into PvP.
-    if (isNative && window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.App) {
-      var DApp = Capacitor.Plugins.App;
-      var parseJoin = function (url) {
-        if (!url) return '';
-        try { var qi = url.indexOf('?'); var q = qi >= 0 ? url.slice(qi + 1) : '';
-          return (new URLSearchParams(q).get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); }
-        catch (e) { return ''; }
-      };
-      DApp.addListener('appUrlOpen', function (d) { var c = parseJoin(d && d.url); if (c) location.href = 'pvp/index.html?join=' + c; });
-      if (DApp.getLaunchUrl) DApp.getLaunchUrl().then(function (r) {
-        var c = parseJoin(r && r.url);
-        if (c && !sessionStorage.getItem('pvp_djoin')) { try { sessionStorage.setItem('pvp_djoin', '1'); } catch (e) {} location.href = 'pvp/index.html?join=' + c; }
-      }).catch(function () {});
-    }
-
-    var chooser = document.getElementById('modeChooser');
-    if (!chooser) return;
-    function lock(on) { document.documentElement.classList.toggle('chooser-open', on); document.body.classList.toggle('chooser-open', on); }
-    function show() { chooser.classList.remove('hidden'); lock(true); }
-    function hide() { chooser.classList.add('hidden'); lock(false); }
-    if (isNative || location.hash === '#games') { show(); if (history.replaceState) history.replaceState(null, '', location.pathname); }   // app: choose on launch; web: ⇄ from any mode opens the chooser here
-    var pvp = document.getElementById('mcPvp');
-    if (pvp) pvp.addEventListener('click', function () {
-      if (isNative) { location.href = 'pvp/index.html'; return; }   // in the app: open PvP
-      showPvpAppGate();                                             // on the web: PvP is app-only for now, drive downloads
-    });
-    document.getElementById('mcEpl').addEventListener('click', hide);
-    var laligaCard = document.getElementById('mcLaliga');
-    laligaCard.addEventListener('click', function () { location.href = 'laliga/index.html'; });
-    if (!isNative) laligaCard.classList.add('hidden');                  // La Liga / Primera Division is app-only on the web for now
-    document.getElementById('mcWc').addEventListener('click', function () { location.href = 'nationscup/index.html'; });
-    document.getElementById('mcEc').addEventListener('click', function () { location.href = 'europeanleague/index.html'; });
-    var g = document.getElementById('gamesBtn');
-    if (g) { g.classList.remove('hidden'); g.addEventListener('click', show); }
-    var promo = document.getElementById('ncPromo');
-    if (promo) promo.addEventListener('click', function (e) { e.preventDefault(); show(); });   // "New PvP mode" promo opens the games menu
-
-    // PvP is app-only on the web for now (until the site is monetized). The card stays, but on the
-    // web a tap shows a download prompt with both store links instead of opening PvP, to drive installs.
-    function showPvpAppGate() {
-      var existing = document.getElementById('pvpAppGate');
-      if (existing) { existing.classList.remove('hidden'); return; }
-      if (!document.getElementById('pvpAppGateCSS')) {
-        var st = document.createElement('style'); st.id = 'pvpAppGateCSS';
-        st.textContent = '.pvpgate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,6,12,.82)}'
-          + '.pvpgate.hidden{display:none}'
-          + '.pvpgate-box{width:100%;max-width:380px;background:#12121f;border:1px solid #23233a;border-radius:18px;padding:26px 22px;text-align:center;color:#e9e9f2;font-family:Inter,system-ui,sans-serif}'
-          + '.pvpgate-box .em{font-size:42px;line-height:1;margin-bottom:6px}'
-          + '.pvpgate-box h3{margin:0 0 8px;font-size:21px;font-weight:900}'
-          + '.pvpgate-box p{margin:0 0 18px;color:#8a8aa3;font-size:14px;line-height:1.55}'
-          + '.pvpgate-box a.store{display:flex;align-items:center;justify-content:center;width:100%;padding:13px 16px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;margin-bottom:10px}'
-          + '.pvpgate-box a.ios{background:#fff;color:#000}'
-          + '.pvpgate-box a.android{background:linear-gradient(90deg,#ff2e7e,#7b2ff7 55%,#13d4c4);color:#fff}'
-          + '.pvpgate-box .close{margin-top:4px;background:none;border:none;color:#8a8aa3;font-weight:700;font-size:13px;cursor:pointer}';
-        document.head.appendChild(st);
-      }
-      var box = document.createElement('div');
-      box.id = 'pvpAppGate'; box.className = 'pvpgate';
-      box.innerHTML = '<div class="pvpgate-box">'
-        + '<div class="em">⚔️</div>'
-        + '<h3>PvP is on the app</h3>'
-        + '<p>PvP is currently only available in the 38-0-0 app. Download it free to draft head to head against players worldwide.</p>'
-        + '<a class="store ios" href="https://apps.apple.com/app/id6776756035" target="_blank" rel="noopener">Download on the App Store</a>'
-        + '<a class="store android" href="https://play.google.com/store/apps/details?id=com.sancarmedia.go380" target="_blank" rel="noopener">Get it on Google Play</a>'
-        + '<button class="close" type="button">Maybe later</button>'
-        + '</div>';
-      box.addEventListener('click', function (e) { if (e.target === box) box.classList.add('hidden'); });
-      box.querySelector('.close').addEventListener('click', function () { box.classList.add('hidden'); });
-      document.body.appendChild(box);
-    }
-  })();
-  </script>
-
-  <!-- Nations Cup cross-promo. Shows to desktop web visitors only. Hidden in the native app
-       (the chooser handles modes there) and on mobile web (iOS and Android get the app-download
-       banner instead, so we don't show a second competing CTA). -->
-  <script>
-  (function () {
-    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-    var ua = navigator.userAgent || '';
-    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    var isAndroid = /Android/.test(ua);
-    if (isNative || isIOS || isAndroid) return;
-    var p = document.getElementById('ncPromo');
-    if (p) p.classList.remove('hidden');
-  })();
-  </script>
 
 
 
