@@ -638,3 +638,38 @@ body.mode-expert #gameScreen .slot-ov{display:none !important}
 .setup-how li b{color:#fff}
 .setup-how li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px;
   background:linear-gradient(180deg,#ff2d78,#13d4c4)}
+
+/* setup how-to: icon cards statt Bullets */
+.setup-how{display:flex;flex-direction:column;gap:10px;max-width:380px;margin:20px auto 28px;list-style:none;padding:0}
+.setup-how-item{display:flex;align-items:center;gap:14px;padding:12px 16px;
+  border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  background:rgba(255,255,255,.04);font-size:15px;color:var(--muted)}
+.setup-how-item b{color:#fff}
+.shw-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center}
+
+
+/* v3.2 — compact poster build area (no stretch / clipping) */
+.pitch{aspect-ratio:auto !important;width:100%;max-width:480px;height:min(72vh,600px);margin:0 auto}
+.pitch::after{display:none !important}   /* drop the overlapping L I N E·U P label */
+
+/* v3.2 — booking budget UI */
+.budget-chip{display:inline-flex;align-items:baseline;gap:6px;font-weight:900;font-size:15px;color:#fff;
+  padding:7px 14px;border-radius:999px;border:1px solid rgba(19,212,196,.4);
+  background:rgba(19,212,196,.1);font-family:var(--disp);letter-spacing:.04em}
+.budget-chip .bc-l{font-size:10px;letter-spacing:.18em;color:var(--accent3);font-family:'Inter',sans-serif;font-weight:800}
+.budget-chip .bc-of{font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;font-weight:700}
+.budget-chip.low{border-color:rgba(255,84,112,.55);background:rgba(255,84,112,.12);color:#ff8da3}
+.budget-chip.low .bc-l{color:#ff8da3}
+
+.draft-cols .cost{min-width:54px;text-align:right}
+.prow-cost{min-width:54px;text-align:right;font-weight:900;font-size:16px;color:var(--gold);
+  font-family:var(--disp);letter-spacing:.02em;padding-right:6px}
+.prow-cost.over{color:#ff6b82}
+.prow.ineligible .prow-cost{opacity:.45}
+
+
+/* euro amounts are wider than the old £ values */
+.draft-cols .cost{min-width:74px}
+.prow-cost{min-width:74px;font-size:15px}
+.budget-chip{font-size:14px}
+@media (max-width:560px){ .prow-cost{min-width:64px;font-size:13px} .budget-chip{font-size:12px;padding:6px 10px} }

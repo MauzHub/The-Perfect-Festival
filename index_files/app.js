@@ -16,17 +16,17 @@ const FORMATIONS = {
   // ONE billing. Stages are tiered by SIZE, not genre — any act can play any stage. Weight drives how
   // much a stage counts toward the score (headliners matter most). Laid out as a poster, top->bottom.
   'main': { name:'The Line-up', slots:[
-    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:25, y:10},
-    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:8},
-    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:75, y:10},
-    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:33, y:32},
-    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:67, y:32},
-    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:33, y:49},
-    {id:'M4', label:'Field',    fam:'ANY', tier:2, weight:1.0, x:67, y:49},
-    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:33, y:68},
-    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:67, y:68},
-    {id:'U3', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:33, y:84},
-    {id:'U4', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:67, y:84},
+    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:24, y:15},
+    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:12},
+    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:76, y:15},
+    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:33, y:38},
+    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:67, y:38},
+    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:33, y:54},
+    {id:'M4', label:'Field',    fam:'ANY', tier:2, weight:1.0, x:67, y:54},
+    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:33, y:72},
+    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:67, y:72},
+    {id:'U3', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:33, y:88},
+    {id:'U4', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:67, y:88},
   ]},
 };
 
@@ -169,15 +169,28 @@ function openSlots(){ return SLOTS.filter(s => !state.picks[s.id]); }
 // An act can play ANY stage — stages differ by billing (size), not genre. The only rule is that the
 // same artist can't be on the bill twice (deduped by name, even across different festival editions).
 function isNameUsed(name){ return Object.values(state.picks).some(x => x.player.n === name); }
-function slotAccepts(slot, p){ return !!slot && !isNameUsed(p.n); }
+function slotAccepts(slot, p){ return !!slot && !isNameUsed(p.n) && canAfford(p); }
 function playerOpenSlots(p){ return isNameUsed(p.n) ? [] : openSlots(); }
 function isUsed(p){ return isNameUsed(p.n); }
+// ---- BOOKING BUDGET ----
+const BUDGET = 480;          // total to spend on the 11-act bill (calibrated)
+const RESERVE = 18;          // kept aside per still-open stage so you can always finish (no dead-ends)
+const MONEY_UNIT = 25000;   // display only: raw cost -> euro booking fee (budget 480 -> €12M)
+function fmtMoney(raw){
+  const e = (raw || 0) * MONEY_UNIT;
+  if (e >= 1e6){ const m = e / 1e6; return '€' + (m >= 10 ? Math.round(m) : (Math.round(m * 10) / 10)) + 'M'; }
+  return '€' + Math.round(e / 1000) + 'k';
+}
+function spent(){ return Object.values(state.picks).reduce((a,x)=>a+(x.player.cost||0),0); }
+function remaining(){ return (state.budget||BUDGET) - spent(); }
+// Can this act be booked now without making the rest of the bill unaffordable?
+function canAfford(p){ return (p.cost||0) <= remaining() - Math.max(0, openSlots().length - 1) * RESERVE; }
 function isActPicked(p){ return isNameUsed(p.n); }
 // A spun edition is still useful if it holds an artist not already on the bill.
 function comboHasEligible(c){
   if (!openSlots().length) return true;
   const squad = DATA.squads[`${c[0]}|${c[1]}`] || [];
-  return squad.some(p => !isNameUsed(p.n));
+  return squad.some(p => !isNameUsed(p.n) && canAfford(p));
 }
 function pickCombo(){
   const wt = (c) => BIG_SIX.has(c[0]) ? BIG_SIX_WEIGHT : 1;
@@ -206,16 +219,16 @@ function showSetup(){
   const st = $('setupStart'); if (st) st.classList.remove('hidden');
   window.scrollTo(0, 0);
 }
-function maybeShowStart(){
-  $('setupStart').classList.toggle('hidden', !(setupMode && setupFormation));
-}
+function maybeShowStart(){ /* no-op: setup always shows start button */ }
 function startGame(mode, formationKey){
   const f = FORMATIONS[formationKey] || FORMATIONS['main'];
   SLOTS = f.slots;
   currentFormationKey = formationKey;
   spinCount = 0;
   state = { round: 1, current: null, selectedIdx: null, picks: {}, moving: null, spinning: false,
-            result: null, respinUsed: false, mode, expert: mode === 'expert', formation: formationKey };
+            result: null, respinUsed: false, mode, expert: mode === 'expert', formation: formationKey,
+            budget: BUDGET };
+  updateBudgetUI();
   document.body.classList.toggle('mode-expert', mode === 'expert');
   $('formationTag').textContent = f.name;
   $('setupScreen').classList.add('hidden');
@@ -326,7 +339,7 @@ function onSlotClick(slotId){
   const player = state.current.players[state.selectedIdx];
   const slot = slotById(slotId);
   if (!slot || !slotAccepts(slot, player)){
-    toast(`${player.n} can't go there`); return;
+    toast(canAfford(player) ? `${player.n} can't go there` : `${player.n} is over budget`); return;
   }
   state.picks[slotId] = { player, team: state.current.team, year: state.current.year, slotId };
   if (window.NativeAds) NativeAds.haptic('MEDIUM');
@@ -340,6 +353,7 @@ function onSlotClick(slotId){
   $('spinBtn').disabled = false;
   $('spinHint').textContent = `${countPicks()}/${TOTAL_ROUNDS} slots booked — spin for the next.`;
   updateRoundPill();
+  updateBudgetUI();
   refreshPitch();
   if (window.innerWidth <= 900) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -567,6 +581,7 @@ function updateInstruct(){
   }
 }
 function renderPlayerList(filter){
+  updateBudgetUI();
   const list = $('playerList');
   list.innerHTML = '';
   const f = (filter || '').toLowerCase();
@@ -577,24 +592,22 @@ function renderPlayerList(filter){
     .forEach((p) => {
       const realIdx = players.indexOf(p);
       const used = isUsed(p);
-      const eligible = !used && playerOpenSlots(p).length > 0;
+      const eligible = !used && playerOpenSlots(p).length > 0 && canAfford(p);
       const row = document.createElement('div');
       row.className = 'prow'
         + (used ? ' ineligible' : '')
         + (!used && !eligible ? ' ineligible' : '')
         + (state.selectedIdx === realIdx ? ' selected' : '');
       const posTag = (p.p && p.p[0]) ? p.p[0] : '—';
-      const usedTag = used ? ' · already on the bill' : '';
+      const tooExpensive = !used && !canAfford(p);
+      const usedTag = used ? ' · already on the bill' : (tooExpensive ? ' · over budget' : '');
       row.innerHTML =
         `<div class="prow-face">${jerseySVG(team, initials(p.n), 40)}</div>` +
         `<div class="prow-id">
            <div class="prow-name">${p.n}</div>
            <div class="prow-meta"><span class="prow-pos">${(p.p||[]).join('/')||posTag}</span>${usedTag}</div>
          </div>
-         <div class="prow-stats">
-           <b data-k="PAC">${stat(p,'pac')}</b><b data-k="SHO">${stat(p,'sho')}</b><b data-k="PAS">${stat(p,'pas')}</b>
-           <b data-k="DRI">${stat(p,'dri')}</b><b data-k="DEF">${stat(p,'def')}</b><b data-k="PHY">${stat(p,'phy')}</b>
-         </div>
+         <div class="prow-cost ${tooExpensive ? 'over' : ''}">${fmtMoney(p.cost||0)}</div>
          <div class="prow-ov ${ovClass(p.o)}">${p.o}</div>`;
       if (eligible) row.addEventListener('click', () => selectPlayer(realIdx));
       list.appendChild(row);
@@ -605,6 +618,12 @@ function renderPlayerList(filter){
   }
 }
 function stat(p, key){ const v = p[key]; return v > 0 ? v : '–'; }
+function updateBudgetUI(){
+  const el = document.getElementById('budgetChip'); if (!el) return;
+  const left = remaining();
+  el.innerHTML = `<span class="bc-l">BUDGET</span> ${fmtMoney(left)}<span class="bc-of"> / ${fmtMoney(state.budget||BUDGET)}</span>`;
+  el.classList.toggle("low", left <= 60);
+}
 
 function selectPlayer(idx){
   state.selectedIdx = (state.selectedIdx === idx) ? null : idx;
@@ -623,29 +642,29 @@ function selectPlayer(idx){
 // Tightened top-tier thresholds (v2.1): a perfect / unbeaten / centurion season now needs a strong
 // rating AND a good season swing, not rating alone. Calibrated in scripts/calibrate_epl.py to
 // ~1 in 600 (38-0-0), ~1 in 50 (Invincibles), ~1 in 14 (Centurions) for a strong draft.
-const GOAT_T = 94.80, INV_T = 93.85, CENT_T = 93.05;   // sold-out tour / sell-out tour / headline-act floors
-const B_CHAMP = 91.00, B_CL = 89.00, B_EUR = 87.00, B_MID = 84.00;   // headliner / main-stage / big-top / mid-bill bands
+const GOAT_T = 89.30, INV_T = 88.30, CENT_T = 87.30;   // perfect / legendary / headline-act floors (budget era)
+const B_CHAMP = 86.00, B_CL = 84.30, B_EUR = 82.30, B_MID = 79.80;   // headliners / main-stage / big-top / mid-bill bands
 const SEASON_VAR = 3.0;   // season swing multiplier (a league is more predictable than a cup)
 
 // Rating -> (W,D) anchors. Records interpolate between these; L = 38 - W - D.
 // Tuned so badge bands (by rating) line up with believable season records.
 const RECORD_ANCHORS = [
-  // lineup rating -> (sold-out shows W, half-full D); flops L = 38 - W - D. Rescaled to the
-  // believable draw-power scale (top acts ~95-97), GOAT_T=95.2. Same curve shape as the original.
-  [67.75,   1,  3],   // cancelled-tier: a near-empty run
-  [71.75,   3,  5],
-  [76.00,   4,  8],
-  [80.00,   8,  9],
-  [84.00,  12, 11],   // mid-bill floor
-  [86.00,  16, 10],
-  [87.00,  18, 10],   // big-top floor
-  [88.00,  20,  9],
-  [89.00,  22,  9],   // main-stage floor
-  [90.00,  25,  8],
-  [91.00,  27,  8],   // headliners floor
-  [CENT_T, 32,  4],   // headline-act floor (100 hype)
-  [INV_T,  34,  4],   // sell-out-tour floor (unbeaten)
-  [GOAT_T, 38,  0],   // perfect festival (38-0-0)
+  // festival score -> internal (W,D) used only for the over/under-performance verdict flavour.
+  // Rescaled to the budget-era achievable range (~76–89.3).
+  [74.0,   1,  3],
+  [76.5,   3,  5],
+  [78.5,   5,  8],
+  [80.5,   8,  9],
+  [82.3,  12, 11],   // big-top floor
+  [84.3,  16, 10],   // main-stage floor
+  [85.2,  19, 10],
+  [B_CHAMP,22,  9],  // headliners floor
+  [87.0,  26,  8],
+  [CENT_T, 30,  6],  // headline-act floor
+  [88.0,  33,  4],
+  [INV_T,  35,  3],  // legendary floor
+  [89.0,  37,  1],
+  [GOAT_T, 38,  0],  // perfect festival
 ];
 function recordFromRating(S){
   if (S >= GOAT_T) return { W:38, D:0, L:0 };
@@ -676,16 +695,14 @@ function bandTier(x){
   return 'RELEGATION';
 }
 function tierFor(r){
-  const { W, L, pts } = r; const x = (r.aS != null ? r.aS : r.S);   // the ACTUAL season drives band tiers
-  if (r.isWoat)   return { name:'CANCELLED',        color:'linear-gradient(135deg,#c69a5b,#7a4a2a)' };
-  if (W === 38)   return { name:'PERFECT FESTIVAL', color:'linear-gradient(135deg,#ffd24a,#ff2d78,#7c3aed)' };
-  if (L === 0)    return { name:'SELL-OUT TOUR',    color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
-  if (pts >= 100) return { name:'HEADLINE ACT',     color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
-  if (x >= B_CHAMP) return { name:'FESTIVAL HEADLINERS', color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
-  if (x >= B_CL) return { name:'MAIN STAGE',       color:'linear-gradient(135deg,#7c3aed,#ff2d78)' };
-  if (x >= B_EUR) return { name:'BIG TOP',          color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
-  if (x >= B_MID) return { name:'MID-BILL',         color:'linear-gradient(135deg,#5a5a72,#8a8aa3)' };
-  if (pts < 11)   return { name:'EMPTY FIELD',      color:'linear-gradient(135deg,#4a2a2a,#1a1216)' };
+  const x = (r.aS != null ? r.aS : r.S);   // the festival score drives the tier
+  if (x >= GOAT_T) return { name:'PERFECT FESTIVAL',    color:'linear-gradient(135deg,#ffd24a,#ff2d78,#7c3aed)' };
+  if (x >= INV_T)  return { name:'LEGENDARY LINE-UP',   color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
+  if (x >= CENT_T) return { name:'HEADLINE ACT',        color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
+  if (x >= B_CHAMP)return { name:'FESTIVAL HEADLINERS', color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
+  if (x >= B_CL)   return { name:'MAIN STAGE',          color:'linear-gradient(135deg,#7c3aed,#ff2d78)' };
+  if (x >= B_EUR)  return { name:'BIG TOP',             color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
+  if (x >= B_MID)  return { name:'MID-BILL',            color:'linear-gradient(135deg,#5a5a72,#8a8aa3)' };
   return { name:'OPEN-MIC NIGHT', color:'linear-gradient(135deg,#ff5470,#7a2a3a)' };
 }
 /* ---------- WOAT: the 0-0-38 (inverse of the GOAT) ----------
@@ -818,9 +835,9 @@ function finishRank(x){
 }
 // Plain-English finish, used by the recap so the verdict always reads consistently with the badge.
 function finishDesc(rank){
-  if (rank >= 100) return 'a perfect sold-out tour';
-  if (rank >= 99)  return 'a sell-out tour';
-  if (rank >= 98)  return 'a headline run';
+  if (rank >= 100) return 'a perfect bill';
+  if (rank >= 99)  return 'a legendary bill';
+  if (rank >= 98)  return 'a headline bill';
   const pos = 80 - rank;
   return pos === 1 ? 'top billing' : `${ordinal(pos)} on the bill`;
 }
@@ -907,39 +924,38 @@ function honourLabel(r){
 // read differently. No em dashes. Needs r.position (set by populateBreakdown) before it is called.
 function recapText(r){
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
-  const key = r.isWoat ? 'WOAT' : r.W === 38 ? 'GOAT' : r.L === 0 ? 'INVINCIBLES' : r.pts >= 100 ? 'CENTURIONS'
-            : r.pts < 11 ? 'DERBY' : bandTier(r.aS);
+  const key = bandTier(r.aS);
   const head = {
-    WOAT: ["The tour nobody came to. Thirty-eight dates, thirty-eight empty fields: a flawless 0-for-38.",
-           "Cancelled, basically. The lowest-drawing act available in every single slot, and not one ticket sold.",
-           "0-for-38. A masterclass in how not to book a festival, and somehow weirdly iconic."],
-    GOAT: ["Perfection. Thirty-eight shows, thirty-eight sell-outs, and a place in festival folklore.",
-           "The impossible bill. Every date sold out and the tour went a flawless 38-0-0.",
-           "Flawless from the first soundcheck to the last encore. A perfect, sold-out, all-conquering run."],
-    INVINCIBLES: ["Not a single empty night all tour. The full 38 dates without a flop.",
-                  "A sell-out tour. Nobody could half-fill a room across the whole run.",
-                  "An unbeatable run: a couple of slow nights, but never a flop."],
-    CENTURIONS: ["A headline act in every sense. Relentless, record-breaking, almost untouchable.",
-                 "They smashed through the hype ceiling and ran away with the summer.",
-                 "Triple-figure hype. A ruthless, festival-topping juggernaut."],
-    CHAMPIONS: ["Headliners. They closed the main stage to a packed field.",
-                "Top of the bill, and they earned it with room to spare.",
-                "The headline slot was theirs after a commanding run."],
-    'CHAMPIONS LEAGUE': ["A main-stage finish and a slot every promoter would fight for.",
-                         "They booked the main stage with comfort.",
-                         "Comfortably onto the main stage after a strong run."],
-    EUROPA: ["A big-top finish. Solid, respectable, the right side of the bill.",
-             "Second-stage billing, and a decent weekend's work.",
-             "They sneaked onto the big top after a steady run."],
-    'MID-TABLE': ["Mid-bill and meandering. On the poster, but in the small print.",
-                  "A forgettable run in the middle of the line-up, neither up nor down.",
-                  "Mid-bill filler. Comfortable, if utterly unremarkable."],
-    RELEGATION: ["An open-mic scrap, with just getting on stage the only goal.",
-                 "They spent the whole tour staring at half-empty rooms.",
-                 "A grim, grinding fight to fill the smallest tent."],
-    DERBY: ["Historically empty. A hype total to forget and a tour best buried.",
-            "An empty field. A run of pure, record-setting tumbleweed.",
-            "An all-time low. Out of their depth from the very first soundcheck."]
+    WOAT: ["A line-up nobody showed up for — the lowest-drawing act bookable in every slot.",
+           "Bottom of every bill. Somehow the worst possible festival you could put together.",
+           "Cancelled in spirit. Not one name anyone would cross the road for."],
+    GOAT: ["Perfection. A bill so stacked it belongs in festival folklore.",
+           "The dream line-up — flawless from the headliners to the smallest tent.",
+           "Untouchable. Every stage a headliner could play. A perfect festival."],
+    INVINCIBLES: ["A legendary line-up — top to bottom, barely a weak slot on the poster.",
+                  "Heavyweight billing. The kind of poster people screenshot.",
+                  "An all-killer bill that any promoter would kill to book."],
+    CENTURIONS: ["A genuine headline act — relentless star power across the weekend.",
+                 "Box-office from the first name to the last. A serious bill.",
+                 "Star-studded and stacked. This one sells itself."],
+    CHAMPIONS: ["Headliners. A poster that tops any main stage.",
+                "Top billing, with the names to back it up.",
+                "A commanding bill that closes the main stage."],
+    'CHAMPIONS LEAGUE': ["A main-stage line-up promoters would fight over.",
+                         "Comfortably a main-stage bill.",
+                         "Solid main-stage billing across the board."],
+    EUROPA: ["A big-top bill — respectable, the right side of the poster.",
+             "Second-stage billing and a decent weekend's work.",
+             "A steady big-top line-up."],
+    'MID-TABLE': ["Mid-bill and middling. On the poster, in the small print.",
+                  "A forgettable bill stuck in the middle of the line-up.",
+                  "Mid-bill filler — comfortable, unremarkable."],
+    RELEGATION: ["An open-mic scrap — just getting names on the poster.",
+                 "A bill staring at half-empty rooms.",
+                 "A grim fight to fill the smallest tent."],
+    DERBY: ["Historically thin. A poster best left in the drafts folder.",
+            "An empty field of a line-up. Pure tumbleweed.",
+            "An all-time weak bill, out of its depth from the start."]
   }[key];
   const expD = finishDesc(r.expRank), actD = finishDesc(r.actRank);
   const verdict = pick({
@@ -954,10 +970,11 @@ function recapText(r){
                          `Par for this bill: ${expD}, and they delivered exactly that.`]
   }[r.verdict]);
   const ts = topScorer(r.rows, r), star = topPlayer(r.rows).pick.player;
+  const bud = state.budget || BUDGET, sp = spent();
   const numbers = pick([
-    `Final tally: ${r.W} sell-outs, ${r.D} half-full, ${r.L} flops for ${r.pts} hype.`,
-    `${r.pts} hype from a ${r.W}-${r.D}-${r.L} tour when the dust settled.`,
-    `A ${r.W}-${r.D}-${r.L} tour and ${r.pts} hype all told.`
+    `Final festival score: ${r.S}, booked for ${fmtMoney(sp)} of a ${fmtMoney(bud)} budget.`,
+    `A ${r.S}-rated bill, put together for ${fmtMoney(sp)} — ${fmtMoney(bud - sp)} left in the kitty.`,
+    `Score ${r.S}, and ${sp <= bud * 0.8 ? 'shrewdly' : 'only just'} kept inside the ${fmtMoney(bud)} budget.`
   ]);
   const rng = r.famCount >= 5 ? ' Five genres deep, the bill had real range.'
             : r.famCount <= 2 ? ' A one-note bill, and it showed.' : '';
@@ -994,7 +1011,7 @@ function renderResultPoster(r){
     <div class="poster-foot">
       <span class="poster-tier" style="background:${tier.color}">${tier.name}</span>
       <span class="poster-score">${r.S}<small>festival score</small></span>
-      <span class="poster-sold">${r.W} / 38 sold out</span>
+      <span class="poster-sold">${fmtMoney(spent())} of ${fmtMoney(state.budget||BUDGET)} spent</span>
     </div>`;
 }
 
@@ -1011,9 +1028,7 @@ function showResults(){
   const tb = $('tierBadge');
   tb.textContent = tier.name;
   tb.style.background = tier.color;
-  $('resultsQ').textContent = r.isWoat ? 'CANCELLED'
-    : r.W === 38 ? 'THE PERFECT FESTIVAL'
-    : 'YOUR LINE-UP';
+  $('resultsQ').textContent = (r.aS >= GOAT_T) ? 'THE PERFECT FESTIVAL' : 'YOUR LINE-UP';
 
   const xi = $('xiList');
   xi.innerHTML = '';
@@ -1271,7 +1286,7 @@ function buildShareCanvas(){
 
   ctx.textAlign='center'; ctx.fillStyle='#8a8aa3'; ctx.font='700 26px Inter, sans-serif';
   ctx.textBaseline='middle';
-  ctx.fillText(`sold out · half-full · flopped  ·  38-show tour · ${r.pts} hype`, W/2, y0+92);
+  ctx.fillText(`festival score ${r.S}  ·  ${fmtMoney(spent())} of ${fmtMoney(state.budget||BUDGET)} spent`, W/2, y0+92);
 
   // tier badge
   const tier = tierFor(r);
@@ -1363,12 +1378,12 @@ function buildShareCanvas(){
 function resultBlurb(){
   const r = state.result;
   const tier = tierFor(r).name;
-  if (r.isWoat)   return `My festival got CANCELLED: a 0-for-38 tour with the lowest-drawing act in every slot. 🎪 Can you out-flop me?`;
+  if (r.aS < B_MID) return `My festival flopped — an open-mic bill (score ${r.S}). 🎪 Can you do worse?`;
   if (r.isQuad)   return `THE GRAND SLAM: top billing plus all three extras (about 1 in 1,000). 🏆 Beat that line-up.`;
-  if (r.W === 38) return `I booked THE PERFECT FESTIVAL: every one of 38 shows sold out, a flawless tour. 🎤 Bet you can't match the bill.`;
+  if (r.aS >= GOAT_T) return `I booked THE PERFECT FESTIVAL — a flawless ${r.S}-rated bill on a ${fmtMoney(state.budget||BUDGET)} budget. 🎤 Bet you can't match it.`;
   if (r.isTreble) return `THE HAT-TRICK: top billing plus two extras. 🏆 Think your line-up can?`;
   if (r.isDouble) return `THE DOUBLE: top billing plus an extra. Think you can beat my line-up?`;
-  return `I booked a ${tier} festival line-up — ${r.W}/38 shows sold out (score ${r.S}). Think you can beat it?`;
+  return `I booked a ${tier} line-up — score ${r.S}, built for ${fmtMoney(spent())} of a ${fmtMoney(state.budget||BUDGET)} budget. Think you can beat it?`;
 }
 function shareText(){
   // Shares FROM THE APP point friends to the App Store (drive installs); shares from the
@@ -1524,9 +1539,9 @@ async function boot(){
       const fin = finishDesc(r.actRank);   // 'the title', '3rd place', 'an unbeaten season', 'a perfect 38-0-0'
       const rec = r.W + 'W ' + r.D + 'D ' + r.L + 'L';
       let summary;
-      if (fin === 'a perfect sold-out tour') summary = 'Perfect 38-0-0 festival';
-      else if (fin === 'a sell-out tour') summary = 'Sell-out tour · ' + rec;
-      else if (fin === 'a headline run') summary = 'Headline act · ' + rec;
+      if (fin === 'a perfect bill') summary = 'Perfect festival';
+      else if (fin === 'a legendary bill') summary = 'Legendary bill · ' + rec;
+      else if (fin === 'a headline bill') summary = 'Headline bill · ' + rec;
       else if (fin === 'top billing') summary = 'Top billing · ' + rec;
       else summary = 'Finished ' + fin + ' · ' + rec;
       try { const h = (typeof honourLabel === 'function') ? honourLabel(r) : null; if (h) summary += ' · ' + h.toLowerCase(); } catch (e) {}

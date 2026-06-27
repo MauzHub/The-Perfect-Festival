@@ -53,6 +53,7 @@
       <img class="brand-logo" src="./index_files/logo.svg" alt="38-0-0">
       <span class="brand-sub">Book the perfect line-up</span>
     </div>
+    <div class="budget-chip" id="budgetChip"><span class="bc-l">BUDGET</span> €12M</div>
     <div class="round-pill" id="roundPill">Slot 1 / 11</div>
     <button class="icon-btn" id="gamesBtn" title="Choose game">⇄</button>
     <button class="icon-btn" id="resetBtn" title="Start over">↺</button>
@@ -67,11 +68,11 @@
       <img class="setup-logo" src="./index_files/logo.svg" alt="The Perfect Festival">
       <h1 class="setup-title">The Perfect Festival</h1>
       <p class="setup-sub">Spin a festival, draft the acts, and build a line-up that sells out the tour.</p>
-      <ul class="setup-how">
-        <li><b>Spin</b> a real festival &amp; year</li>
-        <li><b>Draft</b> one act onto an open stage</li>
-        <li><b>Fill</b> all 11 stages — biggest acts headline</li>
-      </ul>
+      <div class="setup-how">
+        <div class="setup-how-item"><span class="shw-icon">🎰</span><div><b>Spin</b> a real festival &amp; year</div></div>
+        <div class="setup-how-item"><span class="shw-icon">🎤</span><div><b>Draft</b> one act onto an open stage</div></div>
+        <div class="setup-how-item"><span class="shw-icon">💷</span><div><b>Spend wisely</b> — every act costs, on a fixed budget</div></div>
+      </div>
       <button class="setup-start" id="setupStart">Start booking →</button>
     </div>
   </section>
@@ -109,7 +110,7 @@
         <div class="draft-subhead">
           <span class="draft-instruct" id="draftInstruct">Pick an act for your bill</span>
           <span class="draft-cols">
-            <i>ENE</i><i>HIT</i><i>MUS</i><i>SHW</i><i>LEG</i><i>CRD</i><i class="ov">PULL</i>
+            <i class="cost">COST</i><i class="ov">PULL</i>
           </span>
         </div>
         <button class="respin-btn hidden" id="respinBtn">🎬 Re-spin the genre (watch an ad)</button>
@@ -224,7 +225,7 @@
       <h3>How it works</h3>
       <ol>
         <li><strong>Spin</strong> to draw a real festival and year.</li>
-        <li><strong>Draft one act</strong> from that edition onto an open stage.</li>
+        <li><strong>Draft one act</strong> from that edition onto an open stage — each act costs a booking fee from your fixed budget.</li>
         <li><strong>Place your biggest acts as headliners</strong> — headline stages count for the most.</li>
         <li><strong>Fill all 11 stages</strong> until the poster is complete.</li>
         <li><strong>Get your festival score &amp; tour</strong> — and the tier your bill earns, from an
@@ -238,10 +239,17 @@
         headline slots is what carries a line-up. The same artist can't appear twice, even across different
         festivals. A line-up with genuine genre range also scores a little higher than a one-note bill.</p>
 
-      <h3>The sold-out tour</h3>
-      <p>The ultimate result is a bill so strong that it sells out every date of the tour. It is achievable
-        but deliberately rare — even a perfectly drafted line-up only manages it now and then. Most bills
-        land somewhere between a mid-bill weekend and a main-stage triumph.</p>
+      <h3>The budget</h3>
+      <p>You book the whole bill from one fixed budget of <strong>€12M</strong>, and every act has a booking
+        fee that rises steeply with its draw power — from around €125k for a small act to well over €2M for a
+        headliner. You can't simply buy the biggest name for every stage — the real game is hunting
+        value: a bargain act with a great draw lets you afford a true headliner elsewhere. Spend it all on
+        three superstars and your undercard collapses; spread it too thin and nothing headlines.</p>
+
+      <h3>The perfect festival</h3>
+      <p>The top tier — a flawless bill within budget — is achievable but deliberately rare. Even sharp,
+        value-savvy drafting only reaches it now and then; most line-ups land between a mid-bill weekend
+        and a main-stage triumph.</p>
 
       <h3>Frequently asked questions</h3>
       <div class="faq">
