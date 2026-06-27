@@ -13,53 +13,27 @@ const TOTAL_ROUNDS = 11;
 // map to the RB/LB families; wide mids (RM/LM) map to the RW/LW families — so a player
 // who can play LB can also fill an LWB slot, exactly as the user expects.
 const FORMATIONS = {
-  // BILLINGS — every billing spans all five genres (so the range bonus is even); the LEAN differs.
-  // Poster coords: x,y in %, headliners up top, openers along the bottom. buildPitch() renders them.
-  'balanced': { name:'Balanced Weekend', slots:[
-    {id:'HF', label:'Fri HL',  fam:'POP',  x:27, y:11},
-    {id:'HS', label:'Sat HL',  fam:'ROCK', x:50, y:7},
-    {id:'HU', label:'Sun HL',  fam:'HIP',  x:73, y:11},
-    {id:'SUN',label:'Sunset',  fam:'RNB',  x:33, y:33},
-    {id:'MD', label:'Main',    fam:'POP',  x:67, y:33},
-    {id:'LEG',label:'Legends', fam:'ROCK', x:50, y:46},
-    {id:'DT1',label:'Dance HL',fam:'ELEC', x:24, y:58},
-    {id:'DT2',label:'Dance',   fam:'ELEC', x:76, y:58},
-    {id:'RB', label:'Soul',    fam:'RNB',  x:50, y:67},
-    {id:'RIS',label:'Rising',  fam:'POP',  x:33, y:82},
-    {id:'OPN',label:'Opener',  fam:'HIP',  x:67, y:82},
-  ]},
-  'dance': { name:'Dance-Forward', slots:[
-    {id:'HF', label:'Fri HL',  fam:'ELEC', x:27, y:11},
-    {id:'HS', label:'Sat HL',  fam:'POP',  x:50, y:7},
-    {id:'HU', label:'Sun HL',  fam:'ELEC', x:73, y:11},
-    {id:'SUN',label:'Sunset',  fam:'RNB',  x:50, y:30},
-    {id:'T1', label:'Tent 1',  fam:'ELEC', x:24, y:42},
-    {id:'T2', label:'Tent 2',  fam:'ELEC', x:76, y:42},
-    {id:'MD', label:'Main',    fam:'POP',  x:35, y:54},
-    {id:'PD', label:'Day',     fam:'POP',  x:65, y:54},
-    {id:'RK', label:'Indie',   fam:'ROCK', x:50, y:66},
-    {id:'HIP',label:'Rap',     fam:'HIP',  x:33, y:82},
-    {id:'OPN',label:'Opener',  fam:'HIP',  x:67, y:82},
-  ]},
-  'rock': { name:'Rock-Heavy', slots:[
-    {id:'HF', label:'Fri HL',  fam:'ROCK', x:27, y:11},
-    {id:'HS', label:'Sat HL',  fam:'ROCK', x:50, y:7},
-    {id:'HU', label:'Sun HL',  fam:'POP',  x:73, y:11},
-    {id:'LEG',label:'Legends', fam:'ROCK', x:33, y:33},
-    {id:'IND',label:'Indie',   fam:'ROCK', x:67, y:33},
-    {id:'SUN',label:'Sunset',  fam:'RNB',  x:50, y:46},
-    {id:'DT1',label:'Dance',   fam:'ELEC', x:24, y:58},
-    {id:'DT2',label:'Dance',   fam:'ELEC', x:76, y:58},
-    {id:'PD', label:'Pop',     fam:'POP',  x:50, y:66},
-    {id:'HIP',label:'Rap',     fam:'HIP',  x:33, y:82},
-    {id:'OPN',label:'Opener',  fam:'HIP',  x:67, y:82},
+  // ONE billing. Stages are tiered by SIZE, not genre — any act can play any stage. Weight drives how
+  // much a stage counts toward the score (headliners matter most). Laid out as a poster, top->bottom.
+  'main': { name:'The Line-up', slots:[
+    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:25, y:10},
+    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:8},
+    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:75, y:10},
+    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:33, y:32},
+    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:67, y:32},
+    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:33, y:49},
+    {id:'M4', label:'Field',    fam:'ANY', tier:2, weight:1.0, x:67, y:49},
+    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:33, y:68},
+    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:67, y:68},
+    {id:'U3', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:33, y:84},
+    {id:'U4', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:67, y:84},
   ]},
 };
 
 // The active formation's slots. Set in startGame(); defaults to 4-3-3 so any early
 // reference is safe.
-let SLOTS = FORMATIONS['balanced'].slots;
-let currentFormationKey = 'balanced';
+let SLOTS = FORMATIONS['main'].slots;
+let currentFormationKey = 'main';
 const slotById = (id) => SLOTS.find(s => s.id === id);
 
 // FIFA position -> which family it can play (logical equivalences).
@@ -90,7 +64,7 @@ const DEFAULT_COLORS = ['#7c3aed', '#FFFFFF'];
 const colorsFor = (code) => TEAM_COLORS[code] || DEFAULT_COLORS;
 
 // The "big six" come up a little more often on the spin (small extra weighting).
-const BIG_SIX = new Set(['POP20', 'HIP20', 'POP10', 'LEG90', 'RNB10']);  // crowd-pulling sources come up a touch more
+const BIG_SIX = new Set(['GLA', 'COA', 'LEG']);  // marquee editions come up a touch more
 const BIG_SIX_WEIGHT = 1.6;
 
 // Rewarded "watch an ad to re-spin" feature, powered by Google AdSense H5 Games Ads.
@@ -192,22 +166,29 @@ function eligFamilies(p){
   return s;
 }
 function openSlots(){ return SLOTS.filter(s => !state.picks[s.id]); }
-function playerOpenSlots(p){
-  const fams = eligFamilies(p);
-  return openSlots().filter(s => fams.has(s.fam));
+// An act can play ANY stage — stages differ by billing (size), not genre. The only rule is that the
+// same artist can't be on the bill twice (deduped by name, even across different festival editions).
+function isNameUsed(name){ return Object.values(state.picks).some(x => x.player.n === name); }
+function slotAccepts(slot, p){ return !!slot && !isNameUsed(p.n); }
+function playerOpenSlots(p){ return isNameUsed(p.n) ? [] : openSlots(); }
+function isUsed(p){ return isNameUsed(p.n); }
+function isActPicked(p){ return isNameUsed(p.n); }
+// A spun edition is still useful if it holds an artist not already on the bill.
+function comboHasEligible(c){
+  if (!openSlots().length) return true;
+  const squad = DATA.squads[`${c[0]}|${c[1]}`] || [];
+  return squad.some(p => !isNameUsed(p.n));
 }
-function isUsed(p){
-  return Object.values(state.picks).some(x => x.player.i === p.i);
-}
-
-// Weighted random team-year: big-six club-seasons are slightly more likely.
 function pickCombo(){
   const wt = (c) => BIG_SIX.has(c[0]) ? BIG_SIX_WEIGHT : 1;
+  // Only spin sources that can actually fill an open stage — no dead spins / "spin again" loops.
+  let pool = DATA.combos.filter(comboHasEligible);
+  if (!pool.length) pool = DATA.combos;
   let total = 0;
-  for (const c of DATA.combos) total += wt(c);
+  for (const c of pool) total += wt(c);
   let roll = Math.random() * total;
-  for (const c of DATA.combos){ roll -= wt(c); if (roll <= 0) return c; }
-  return DATA.combos[DATA.combos.length - 1];
+  for (const c of pool){ roll -= wt(c); if (roll <= 0) return c; }
+  return pool[pool.length - 1];
 }
 
 /* ============================================================
@@ -217,22 +198,19 @@ function pickCombo(){
 let setupMode = null;
 let setupFormation = null;
 function showSetup(){
-  setupMode = null;
-  setupFormation = null;
+  setupMode = 'classic';        // always full-info mode (no Classic/Expert choice shown)
+  setupFormation = 'main';      // single billing
   $('gameScreen').classList.add('hidden');
   $('resultsScreen').classList.add('hidden');
   $('setupScreen').classList.remove('hidden');
-  document.querySelectorAll('#setupScreen .mode-card').forEach(c => c.classList.remove('selected'));
-  document.querySelectorAll('#setupScreen .formation-card').forEach(c => c.classList.remove('selected'));
-  $('setupFormationStep').classList.add('hidden');
-  $('setupStart').classList.add('hidden');
+  const st = $('setupStart'); if (st) st.classList.remove('hidden');
   window.scrollTo(0, 0);
 }
 function maybeShowStart(){
   $('setupStart').classList.toggle('hidden', !(setupMode && setupFormation));
 }
 function startGame(mode, formationKey){
-  const f = FORMATIONS[formationKey] || FORMATIONS['balanced'];
+  const f = FORMATIONS[formationKey] || FORMATIONS['main'];
   SLOTS = f.slots;
   currentFormationKey = formationKey;
   spinCount = 0;
@@ -246,7 +224,7 @@ function startGame(mode, formationKey){
   $('draftPane').classList.add('hidden');
   $('spinPane').classList.remove('hidden');
   $('spinBtn').disabled = false;
-  $('spinHint').textContent = 'Spin a genre & era, then draft an act.';
+  $('spinHint').textContent = 'Spin a festival & year, then draft an act.';
   ensureMoveStyles();
   buildPitch();
   updateRoundPill();
@@ -271,6 +249,7 @@ function buildPitch(){
     el.style.left = slot.x + '%';
     el.style.top = slot.y + '%';
     el.dataset.slot = slot.id;
+    el.dataset.tier = slot.tier || 3;
     el.innerHTML = `<div class="slot-node">${slot.label}</div>`;
     el.addEventListener('click', () => onSlotClick(slot.id));
     pitch.appendChild(el);
@@ -318,7 +297,7 @@ function ensureMoveStyles(){
 function startMove(slotId){
   const pick = state.picks[slotId]; if (!pick) return;
   const p = pick.player;
-  const targets = SLOTS.filter(s => !state.picks[s.id] && s.id !== slotId && eligFamilies(p).has(s.fam));
+  const targets = SLOTS.filter(s => !state.picks[s.id] && s.id !== slotId && slotAccepts(s, p));
   if (!targets.length){ toast(`No other open spot for ${p.n}`); return; }
   state.moving = slotId; state.selectedIdx = null;
   if (window.NativeAds && NativeAds.haptic) NativeAds.haptic('LIGHT');
@@ -331,7 +310,7 @@ function moveTo(slotId){
   if (slotId === src){ cancelMove(); return; }
   if (state.picks[slotId]){ startMove(slotId); return; }
   const pick = state.picks[src], slot = slotById(slotId);
-  if (!slot || !pick || !eligFamilies(pick.player).has(slot.fam)){ toast(`${pick.player.n} can't go there`); return; }
+  if (!slot || !pick || !slotAccepts(slot, pick.player)){ toast(`${pick.player.n} can't go there`); return; }
   state.picks[slotId] = Object.assign({}, pick, { slotId });
   delete state.picks[src];
   state.moving = null;
@@ -346,7 +325,7 @@ function onSlotClick(slotId){
   if (state.selectedIdx === null) return;
   const player = state.current.players[state.selectedIdx];
   const slot = slotById(slotId);
-  if (!slot || !eligFamilies(player).has(slot.fam)){
+  if (!slot || !slotAccepts(slot, player)){
     toast(`${player.n} can't go there`); return;
   }
   state.picks[slotId] = { player, team: state.current.team, year: state.current.year, slotId };
@@ -395,8 +374,6 @@ function spin(isRespin){
       state.spinning = false;
       track(isRespin ? 'respin_used' : 'spin', { round: countPicks() + 1, team: combo[0], year: combo[1] });
       openDraft(combo[0], combo[1]);
-      // First nudge: on the 2nd spin, prompt a socials follow (IG + X) once, not the Ko-fi support modal.
-      if (!isRespin && spinCount === 2 && !socialsShown){ socialsShown = true; showSocialsModal(); }
     }
   }, 55);
 }
@@ -405,7 +382,7 @@ function spin(isRespin){
 let spinCount = 0;
 let donationFirstShown = false;
 const KOFI_URL = 'https://ko-fi.com/38_0_0game';
-function showDonationModal(){
+function showDonationModal(){ return; /* disabled */
   if (document.getElementById('donateModal')) return;
   const m = document.createElement('div');
   m.id = 'donateModal';
@@ -434,7 +411,7 @@ function showDonationModal(){
 let socialsShown = false;
 const SOCIAL_X = 'https://x.com/densancar';
 const SOCIAL_IG = 'https://www.instagram.com/densancar/';
-function showSocialsModal(){
+function showSocialsModal(){ return; /* disabled */
   if (document.getElementById('socialsModal')) return;
   const m = document.createElement('div');
   m.id = 'socialsModal';
@@ -555,7 +532,7 @@ function openDraft(teamCode, year){
     $('draftPane').classList.add('hidden');
     $('spinBtn').disabled = false;
     $('spinHint').textContent =
-      `No ${openSlots().map(s=>s.label).join('/')} acts in ${DATA.teams[teamCode].name} ${year} — spin again.`;
+      `Every act from ${DATA.teams[teamCode].name} ${year} is already booked — spin again.`;
     return;
   }
 
@@ -607,12 +584,12 @@ function renderPlayerList(filter){
         + (!used && !eligible ? ' ineligible' : '')
         + (state.selectedIdx === realIdx ? ' selected' : '');
       const posTag = (p.p && p.p[0]) ? p.p[0] : '—';
-      const usedTag = used ? ' · already in XI' : '';
+      const usedTag = used ? ' · already on the bill' : '';
       row.innerHTML =
         `<div class="prow-face">${jerseySVG(team, initials(p.n), 40)}</div>` +
         `<div class="prow-id">
            <div class="prow-name">${p.n}</div>
-           <div class="prow-meta"><span class="prow-pos">${(p.p||[]).join('/')||posTag}</span>Age ${p.a||'—'} · #${p.num||'—'}${usedTag}</div>
+           <div class="prow-meta"><span class="prow-pos">${(p.p||[]).join('/')||posTag}</span>${usedTag}</div>
          </div>
          <div class="prow-stats">
            <b data-k="PAC">${stat(p,'pac')}</b><b data-k="SHO">${stat(p,'sho')}</b><b data-k="PAS">${stat(p,'pas')}</b>
@@ -646,29 +623,29 @@ function selectPlayer(idx){
 // Tightened top-tier thresholds (v2.1): a perfect / unbeaten / centurion season now needs a strong
 // rating AND a good season swing, not rating alone. Calibrated in scripts/calibrate_epl.py to
 // ~1 in 600 (38-0-0), ~1 in 50 (Invincibles), ~1 in 14 (Centurions) for a strong draft.
-const CENT_T = 86.10, INV_T = 86.90, GOAT_T = 87.85;
+const GOAT_T = 94.80, INV_T = 93.85, CENT_T = 93.05;   // sold-out tour / sell-out tour / headline-act floors
+const B_CHAMP = 91.00, B_CL = 89.00, B_EUR = 87.00, B_MID = 84.00;   // headliner / main-stage / big-top / mid-bill bands
 const SEASON_VAR = 3.0;   // season swing multiplier (a league is more predictable than a cup)
 
 // Rating -> (W,D) anchors. Records interpolate between these; L = 38 - W - D.
 // Tuned so badge bands (by rating) line up with believable season records.
 const RECORD_ANCHORS = [
-  // S       W   D   (S column shifted +1.05 vs launch: +0.85 for the iconic squads, then +0.2
-  //                  more to absorb the 2023-2026 seasons + reviewed ratings. Keeps 38-0-0 at
-  //                  ~1 in 450, treble ~1 in 19, quad ~1 in 750 for skilled play across 254 squads.)
-  [60.80,   1,  3],   // catastrophic tank: ~6 pts — below Derby's record-low 11 ("Worse than Derby")
-  [64.80,   3,  5],   // dismal: ~14 pts
-  [69.05,   4,  8],
-  [73.05,   8,  9],
-  [77.05,  12, 11],
-  [79.05,  16, 10],
-  [80.05,  18, 10],
-  [81.05,  20,  9],
-  [82.05,  22,  9],
-  [83.05,  25,  8],
-  [84.05,  27,  8],   // Champions floor
-  [CENT_T,  32,  4],   // Centurions floor (100 pts, a loss or two) — tightened v2.1
-  [INV_T,   34,  4],   // Invincibles floor (unbeaten) — tightened v2.1
-  [GOAT_T,  38,  0],   // GOAT (38-0-0) — tightened v2.1
+  // lineup rating -> (sold-out shows W, half-full D); flops L = 38 - W - D. Rescaled to the
+  // believable draw-power scale (top acts ~95-97), GOAT_T=95.2. Same curve shape as the original.
+  [67.75,   1,  3],   // cancelled-tier: a near-empty run
+  [71.75,   3,  5],
+  [76.00,   4,  8],
+  [80.00,   8,  9],
+  [84.00,  12, 11],   // mid-bill floor
+  [86.00,  16, 10],
+  [87.00,  18, 10],   // big-top floor
+  [88.00,  20,  9],
+  [89.00,  22,  9],   // main-stage floor
+  [90.00,  25,  8],
+  [91.00,  27,  8],   // headliners floor
+  [CENT_T, 32,  4],   // headline-act floor (100 hype)
+  [INV_T,  34,  4],   // sell-out-tour floor (unbeaten)
+  [GOAT_T, 38,  0],   // perfect festival (38-0-0)
 ];
 function recordFromRating(S){
   if (S >= GOAT_T) return { W:38, D:0, L:0 };
@@ -692,10 +669,10 @@ function bandTier(x){
   if (x >= GOAT_T) return 'GOAT';
   if (x >= INV_T)  return 'INVINCIBLES';
   if (x >= CENT_T) return 'CENTURIONS';
-  if (x >= 84.05)  return 'CHAMPIONS';
-  if (x >= 82.05)  return 'CHAMPIONS LEAGUE';
-  if (x >= 80.05)  return 'EUROPA';
-  if (x >= 77.05)  return 'MID-TABLE';
+  if (x >= B_CHAMP)  return 'CHAMPIONS';
+  if (x >= B_CL)  return 'CHAMPIONS LEAGUE';
+  if (x >= B_EUR)  return 'EUROPA';
+  if (x >= B_MID)  return 'MID-TABLE';
   return 'RELEGATION';
 }
 function tierFor(r){
@@ -704,10 +681,10 @@ function tierFor(r){
   if (W === 38)   return { name:'PERFECT FESTIVAL', color:'linear-gradient(135deg,#ffd24a,#ff2d78,#7c3aed)' };
   if (L === 0)    return { name:'SELL-OUT TOUR',    color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
   if (pts >= 100) return { name:'HEADLINE ACT',     color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
-  if (x >= 84.05) return { name:'FESTIVAL HEADLINERS', color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
-  if (x >= 82.05) return { name:'MAIN STAGE',       color:'linear-gradient(135deg,#7c3aed,#ff2d78)' };
-  if (x >= 80.05) return { name:'BIG TOP',          color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
-  if (x >= 77.05) return { name:'MID-BILL',         color:'linear-gradient(135deg,#5a5a72,#8a8aa3)' };
+  if (x >= B_CHAMP) return { name:'FESTIVAL HEADLINERS', color:'linear-gradient(135deg,#ffd24a,#ff9d3d)' };
+  if (x >= B_CL) return { name:'MAIN STAGE',       color:'linear-gradient(135deg,#7c3aed,#ff2d78)' };
+  if (x >= B_EUR) return { name:'BIG TOP',          color:'linear-gradient(135deg,#13d4c4,#7c3aed)' };
+  if (x >= B_MID) return { name:'MID-BILL',         color:'linear-gradient(135deg,#5a5a72,#8a8aa3)' };
   if (pts < 11)   return { name:'EMPTY FIELD',      color:'linear-gradient(135deg,#4a2a2a,#1a1216)' };
   return { name:'OPEN-MIC NIGHT', color:'linear-gradient(135deg,#ff5470,#7a2a3a)' };
 }
@@ -763,7 +740,12 @@ function computeRecord(){
     const pick = state.picks[slot.id];
     return { slot, pick, eff: pick.player.o };
   });
-  const Sraw = rows.reduce((a, r) => a + r.eff, 0) / rows.length;
+  // STAGE-WEIGHTED rating: headliners pull the most weight, the undercard the least — so putting a
+  // big act on a headliner stage matters, and a weak headliner drags the whole bill.
+  const wOf = (s) => s && s.weight != null ? s.weight : 1;
+  let wsum = 0, wtot = 0;
+  rows.forEach(r => { const w = wOf(r.slot); wsum += w * r.eff; wtot += w; });
+  const Sraw = wsum / wtot;
 
   // RANGE BONUS (new): a bill spanning more genres lands better; a one-note bill drags. Modest,
   // so it nudges rather than dominates. Folded into the rating so expectation stays consistent.
@@ -814,10 +796,10 @@ function ordinal(n){ const s = ['th','st','nd','rd'], v = n % 100; return n + (s
 // Final league position from a rating + points. Aligned to the badge bands so the two never
 // contradict (a Champions-tier side always finishes 1st), with points breaking ties inside a band.
 function positionFor(x, p){
-  if (x >= 84.05) return 1;                                   // title: GOAT / Invincibles / Centurions / Champions
-  if (x >= 82.05) return p >= 80 ? 2 : (p >= 74 ? 3 : 4);     // Champions League places
-  if (x >= 80.05) return p >= 66 ? 5 : (p >= 60 ? 6 : 7);     // Europa places
-  if (x >= 77.05) return p >= 54 ? 8 : (p >= 48 ? 11 : 14);   // mid-table
+  if (x >= B_CHAMP) return 1;                                   // title: GOAT / Invincibles / Centurions / Champions
+  if (x >= B_CL) return p >= 80 ? 2 : (p >= 74 ? 3 : 4);     // Champions League places
+  if (x >= B_EUR) return p >= 66 ? 5 : (p >= 60 ? 6 : 7);     // Europa places
+  if (x >= B_MID) return p >= 54 ? 8 : (p >= 48 ? 11 : 14);   // mid-table
   return p >= 40 ? 15 : (p >= 34 ? 18 : 20);                  // relegation battle
 }
 function leaguePosition(r){ return positionFor((r.aS != null ? r.aS : r.S), r.pts); }
@@ -873,7 +855,7 @@ function cupResults(S){
   // European Cup: winnable from the Champions floor (now 84.05 after the full pool shift) but
   // rare, climbing for elite sides. The gate that keeps the QUADRUPLE the hardest achievement
   // (~1 in 730 without a re-spin) even with the 254-squad pool.
-  const european = S >= 84.05 && Math.random() < chance(84.05, 124.05, 0.35);
+  const european = S >= B_CHAMP && Math.random() < chance(B_CHAMP, B_CHAMP+40, 0.35);
   return [
     { name:'Set of the Weekend', ico:'🎤', won: league },
     { name:'Surprise of the Fest', ico:'✨', won: national },
@@ -990,9 +972,36 @@ function recapText(r){
 /* ============================================================
    Results
    ============================================================ */
+// Build the end-of-game LINE-UP POSTER (the hero of the results screen).
+function renderResultPoster(r){
+  const byTier = {};
+  r.rows.forEach(row => { (byTier[row.slot.tier] = byTier[row.slot.tier] || []).push(row); });
+  const tier = tierFor(r);
+  const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const hl = (byTier[1] || []).map(row =>
+    `<div class="ph"><span class="ph-day">${esc(row.slot.label)}</span>` +
+    `<span class="ph-act">${esc(row.pick.player.n)}</span></div>`).join('');
+  const rowHtml = (t, cls) => {
+    const acts = (byTier[t] || []).map(row => esc(row.pick.player.n));
+    return acts.length ? `<div class="pr ${cls}">${acts.join('<span class="dot">/</span>')}</div>` : '';
+  };
+  const billing = (FORMATIONS[state.formation] || {}).name || '';
+  return `
+    <div class="poster-kicker">THE PERFECT FESTIVAL · EST. 2026</div>
+    <div class="poster-sub-top">${esc(billing)} · 3 DAYS · 11 STAGES</div>
+    <div class="poster-headliners">${hl}</div>
+    <div class="poster-body">${rowHtml(2,'pr-a')}${rowHtml(3,'pr-b')}${rowHtml(4,'pr-c')}${rowHtml(5,'pr-d')}</div>
+    <div class="poster-foot">
+      <span class="poster-tier" style="background:${tier.color}">${tier.name}</span>
+      <span class="poster-score">${r.S}<small>festival score</small></span>
+      <span class="poster-sold">${r.W} / 38 sold out</span>
+    </div>`;
+}
+
 function showResults(){
   const r = computeRecord();
   state.result = r;
+  { const pm = $('resultPoster'); if (pm) pm.innerHTML = renderResultPoster(r); }
   $('recW').textContent = r.W;
   $('recD').textContent = r.D;
   $('recL').textContent = r.L;
@@ -1002,11 +1011,9 @@ function showResults(){
   const tb = $('tierBadge');
   tb.textContent = tier.name;
   tb.style.background = tier.color;
-  $('resultsQ').textContent = r.isWoat
-    ? 'CANCELLED. A 0-for-38 tour.'
-    : r.W === 38
-      ? 'THE PERFECT FESTIVAL. 38 sold-out shows.'
-      : `Can your line-up sell out all 38? (rated ${r.S})`;
+  $('resultsQ').textContent = r.isWoat ? 'CANCELLED'
+    : r.W === 38 ? 'THE PERFECT FESTIVAL'
+    : 'YOUR LINE-UP';
 
   const xi = $('xiList');
   xi.innerHTML = '';
@@ -1322,16 +1329,29 @@ function buildShareCanvas(){
   ctx.restore();
   ctx.strokeStyle='rgba(255,255,255,.14)'; ctx.lineWidth=2;
   roundRect(ctx,px+1,py+1,pw-2,ph-2,21); ctx.stroke();
-  ctx.fillStyle='rgba(255,255,255,.45)'; ctx.font='900 24px Inter, sans-serif';
-  ctx.textAlign='center'; ctx.textBaseline='top';
-  ctx.fillText('L I N E - U P', px+pw/2, py+16);
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='400 26px "Bebas Neue", Inter, sans-serif';
+  ctx.textBaseline='top'; ctx.fillText('L I N E · U P', px+pw/2, py+18);
 
-  // jerseys
-  r.rows.forEach(({slot, pick})=>{
-    const cx = px + pw * (slot.x/100);
-    const cy = py + ph * (slot.y/100);
-    drawJerseyCanvas(ctx, cx, cy, 92, pick.team, initials(pick.player.n), pick.player.o, pick.player.n);
+  // group rows by stage tier and draw a real text poster (headliners big, undercard descending)
+  const byTier = {};
+  r.rows.forEach(row => { (byTier[row.slot.tier] = byTier[row.slot.tier] || []).push(row); });
+  const cx = px + pw/2;
+  let y = py + 64;
+  (byTier[1] || []).forEach(row => {
+    ctx.fillStyle = '#13d4c4'; ctx.font = '400 20px "Bebas Neue", Inter, sans-serif';
+    ctx.fillText(row.slot.label.toUpperCase(), cx, y); y += 26;
+    ctx.fillStyle = '#ffffff'; ctx.font = '400 58px "Bebas Neue", Inter, sans-serif';
+    ctx.fillText(row.pick.player.n, cx, y); y += 64;
   });
+  y += 6;
+  const drawRow = (t, size, col) => {
+    const acts = (byTier[t] || []).map(rw => rw.pick.player.n);
+    if (!acts.length) return;
+    ctx.fillStyle = col; ctx.font = `400 ${size}px "Bebas Neue", Inter, sans-serif`;
+    ctx.fillText(acts.join('   /   '), cx, y); y += size + 14;
+  };
+  drawRow(2, 34, '#f3f0fb'); drawRow(3, 29, '#d9d4ea'); drawRow(4, 25, '#c2bcd6'); drawRow(5, 22, '#a59fbd');
 
   // footer
   ctx.fillStyle='#8a8aa3'; ctx.font='800 30px Inter, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
@@ -1345,10 +1365,10 @@ function resultBlurb(){
   const tier = tierFor(r).name;
   if (r.isWoat)   return `My festival got CANCELLED: a 0-for-38 tour with the lowest-drawing act in every slot. 🎪 Can you out-flop me?`;
   if (r.isQuad)   return `THE GRAND SLAM: top billing plus all three extras (about 1 in 1,000). 🏆 Beat that line-up.`;
-  if (r.W === 38) return `I booked THE PERFECT FESTIVAL: 38 sold-out shows, a flawless 38-0-0 tour. 🎤 Bet you can't match the bill.`;
+  if (r.W === 38) return `I booked THE PERFECT FESTIVAL: every one of 38 shows sold out, a flawless tour. 🎤 Bet you can't match the bill.`;
   if (r.isTreble) return `THE HAT-TRICK: top billing plus two extras. 🏆 Think your line-up can?`;
   if (r.isDouble) return `THE DOUBLE: top billing plus an extra. Think you can beat my line-up?`;
-  return `I booked a ${r.W}-${r.D}-${r.L} festival line-up (${tier}). Think you can beat it?`;
+  return `I booked a ${tier} festival line-up — ${r.W}/38 shows sold out (score ${r.S}). Think you can beat it?`;
 }
 function shareText(){
   // Shares FROM THE APP point friends to the App Store (drive installs); shares from the
@@ -1446,38 +1466,13 @@ async function boot(){
   $('respinBtn').addEventListener('click', rewardedRespin);
   $('resetBtn').addEventListener('click', () => { if (confirm('Start a new XI?')) showSetup(); });
 
-  // Setup screen: choose mode, then formation, then start.
-  document.querySelectorAll('#setupScreen .mode-card').forEach(card => {
-    card.addEventListener('click', () => {
-      setupMode = card.dataset.mode;
-      document.querySelectorAll('#setupScreen .mode-card').forEach(c => c.classList.toggle('selected', c === card));
-      $('setupFormationStep').classList.remove('hidden');
-      maybeShowStart();
-      $('setupFormationStep').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  });
-  const fgrid = $('formationGrid');
-  Object.keys(FORMATIONS).forEach(key => {
-    const b = document.createElement('button');
-    b.className = 'formation-card';
-    b.dataset.formation = key;
-    b.textContent = FORMATIONS[key].name;
-    b.addEventListener('click', () => {
-      setupFormation = key;
-      document.querySelectorAll('#setupScreen .formation-card').forEach(c => c.classList.toggle('selected', c === b));
-      maybeShowStart();
-    });
-    fgrid.appendChild(b);
-  });
-  $('setupStart').addEventListener('click', () => {
-    if (setupMode && setupFormation) startGame(setupMode, setupFormation);
-  });
+  // Setup screen: a single Start button (mode = classic, one billing — no extra choices).
+  $('setupStart').addEventListener('click', () => startGame('classic', 'main'));
 
   // After the first completed game, prompt a socials follow (once).
   $('againBtn').addEventListener('click', () => {
     track('build_another');
     showSetup();
-    if (!socialsShown){ socialsShown = true; showSocialsModal(); return; }   // first replay → socials
     // Interstitial on replay for non-paying users: native uses AdMob, web uses H5 Games Ads.
     const paid = window.IAP && IAP.hasNoAds();
     if (!paid){

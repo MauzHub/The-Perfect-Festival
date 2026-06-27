@@ -1,0 +1,37 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Perfect Festival">
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2d78"/><stop offset=".5" stop-color="#7c3aed"/><stop offset="1" stop-color="#13d4c4"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#e0a51c"/>
+    </linearGradient>
+    <linearGradient id="bars" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#ff5fa2"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="50%" cy="42%" r="62%">
+      <stop offset="0" stop-color="#1b1136"/><stop offset="1" stop-color="#0a0a12"/>
+    </radialGradient>
+    <filter id="g" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="256" cy="256" r="232" fill="url(#bg)" stroke="url(#ring)" stroke-width="16"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-opacity=".6"/>
+  <path d="M256 92 l13 30 33 4 -24 23 6 33 -28 -16 -28 16 6 -33 -24 -23 33 -4 z" fill="url(#gold)" filter="url(#g)"/>
+  <g opacity=".45" filter="url(#g)">
+    <path d="M256 150 L150 330 L205 330 Z" fill="#ff2d78"/>
+    <path d="M256 150 L362 330 L307 330 Z" fill="#13d4c4"/>
+  </g>
+  <g fill="url(#bars)" filter="url(#g)">
+    <rect x="156" y="262" width="24" height="68"  rx="7"/>
+    <rect x="192" y="222" width="24" height="108" rx="7"/>
+    <rect x="228" y="186" width="24" height="144" rx="7"/>
+    <rect x="272" y="208" width="24" height="122" rx="7"/>
+    <rect x="308" y="172" width="24" height="158" rx="7"/>
+    <rect x="344" y="244" width="24" height="86"  rx="7"/>
+  </g>
+  <rect x="142" y="330" width="228" height="11" rx="5" fill="url(#gold)" opacity=".9"/>
+  <text x="256" y="392" text-anchor="middle" font-family="'Bebas Neue',Inter,sans-serif" font-size="40" letter-spacing="9" fill="#fff" opacity=".95">FESTIVAL</text>
+  <text x="256" y="424" text-anchor="middle" font-family="Inter,sans-serif" font-size="17" font-weight="800" letter-spacing="8" fill="url(#gold)">EST · 2026</text>
+</svg>
