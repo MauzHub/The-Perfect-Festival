@@ -548,3 +548,93 @@ body.mode-expert #gameScreen .slot-ov{display:none !important}
 .recap-k{color:var(--muted);font-size:13px;font-weight:600}
 .recap-v{color:var(--txt);font-size:15px;font-weight:800;text-align:right}
 
+
+/* ============================================================
+   v2 — FESTIVAL IDENTITY · LINE-UP POSTER · STAGE TIERS
+   ============================================================ */
+
+/* --- build screen: size stages by tier so headliners read big (poster, not a football XI) --- */
+.slot-node svg{width:100%;height:100%;display:block}
+.slot[data-tier="1"] .slot-node{width:74px;height:74px;border-width:2px}
+.slot[data-tier="2"] .slot-node{width:62px;height:62px}
+.slot[data-tier="1"] .slot-name{font-size:13px;font-weight:800;color:#fff}
+.slot[data-tier="1"].open .slot-node{border-color:var(--gold);color:var(--gold)}
+.slot .slot-name{letter-spacing:.02em}
+.pitch::after{content:"L I N E · U P"}
+
+/* --- results LINE-UP POSTER (the hero) --- */
+.poster{
+  position:relative; max-width:580px; margin:6px auto 22px; padding:30px 24px 22px;
+  border-radius:22px; overflow:hidden; text-align:center; isolation:isolate;
+  background:
+    radial-gradient(130% 55% at 50% -12%, rgba(255,45,120,.22), transparent 60%),
+    radial-gradient(130% 55% at 50% 112%, rgba(19,212,196,.16), transparent 60%),
+    linear-gradient(180deg,#150d28 0%, #0c0b16 60%, #09090f 100%);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 26px 64px rgba(0,0,0,.55), inset 0 0 90px rgba(124,58,237,.16);
+}
+.poster::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:screen;
+  background:
+    linear-gradient(168deg, rgba(255,210,74,.14) 0 5%, transparent 18%),
+    linear-gradient(192deg, rgba(19,212,196,.14) 0 5%, transparent 18%);}
+.poster-kicker{font-family:var(--disp);font-weight:400;letter-spacing:.34em;font-size:14px;color:var(--gold)}
+.poster-sub-top{font-size:10px;letter-spacing:.26em;color:var(--muted);margin:7px 0 20px;text-transform:uppercase}
+.poster-headliners{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
+.ph .ph-day{display:block;font-family:var(--disp);font-size:12px;letter-spacing:.34em;color:var(--accent3)}
+.ph .ph-act{display:block;font-family:var(--disp);font-weight:400;font-size:clamp(32px,8.5vw,54px);line-height:.94;
+  background:linear-gradient(180deg,#ffffff,#ffd6ea);-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 2px 30px rgba(255,45,120,.25)}
+.poster-body{margin:18px 0 18px;display:flex;flex-direction:column;gap:10px}
+.pr{font-family:var(--disp);font-weight:400;letter-spacing:.03em;line-height:1}
+.pr .dot{color:var(--accent);margin:0 .35em;opacity:.85}
+.pr-a{font-size:clamp(21px,5.4vw,32px);color:#f3f0fb}
+.pr-b{font-size:clamp(18px,4.6vw,26px);color:#d9d4ea}
+.pr-c{font-size:clamp(16px,4vw,22px);color:#c2bcd6}
+.pr-d{font-size:clamp(14px,3.4vw,19px);color:#a59fbd}
+.poster-foot{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  margin-top:8px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1)}
+.poster-tier{font-family:var(--disp);font-weight:400;letter-spacing:.1em;font-size:17px;color:#1a1020;
+  padding:5px 18px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.poster-score{font-family:var(--disp);font-weight:400;font-size:38px;color:#fff;line-height:.8;
+  display:flex;flex-direction:column;align-items:center;gap:4px}
+.poster-score small{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.22em;color:var(--muted);font-weight:700}
+.poster-sold{font-size:12px;letter-spacing:.12em;color:var(--gold);font-weight:800;text-transform:uppercase}
+
+/* --- stronger festival identity on the top bar & setup --- */
+.brand-logo,.results-logo-img{filter:drop-shadow(0 0 12px rgba(124,58,237,.5))}
+.topbar{border-bottom:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(180deg, rgba(255,45,120,.06), transparent)}
+.setup-title{font-size:clamp(34px,7vw,52px);font-weight:400;line-height:.95;
+  background:linear-gradient(180deg,#fff,#ffd6ea);-webkit-background-clip:text;background-clip:text;color:transparent}
+.setup-screen::before,.setup-inner::before{content:"";}
+.results-q{background:linear-gradient(180deg,#fff,#e9d8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* --- About: festival poster styling --- */
+.about{border-top:1px solid rgba(255,255,255,.08);
+  background:radial-gradient(120% 60% at 50% -10%, rgba(124,58,237,.12), transparent 60%)}
+.about h2{font-family:var(--disp);font-weight:400;letter-spacing:.06em;font-size:clamp(28px,5vw,40px);
+  background:linear-gradient(90deg,#ff2d78,#13d4c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.about h3{font-family:var(--disp);font-weight:400;letter-spacing:.05em;color:var(--gold);font-size:22px;margin-top:26px}
+.faq-q{color:#fff;font-weight:700;margin-top:14px}
+.faq-a{color:var(--muted)}
+
+/* ============================================================
+   v3 — stage labels fit the circles; single tiered billing
+   ============================================================ */
+.slot-node{font-size:11px;line-height:1.05;padding:4px;text-align:center;overflow:hidden;
+  word-break:break-word;hyphens:auto}
+.slot[data-tier="1"] .slot-node{width:78px;height:78px;font-size:13px;font-weight:800;letter-spacing:.01em}
+.slot[data-tier="2"] .slot-node{width:62px;height:62px;font-size:11px}
+.slot[data-tier="3"] .slot-node{width:54px;height:54px;font-size:10px}
+/* when a stage is filled, the badge fills it — drop the label padding */
+.slot.filled .slot-node{padding:0;font-size:0}
+.slot.filled .slot-node svg{width:100%;height:100%}
+
+/* simplified setup screen */
+.setup-how{list-style:none;margin:18px auto 26px;padding:0;max-width:360px;text-align:left;
+  display:flex;flex-direction:column;gap:10px}
+.setup-how li{position:relative;padding:11px 14px 11px 16px;border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;background:rgba(255,255,255,.03);color:var(--muted);font-size:14px}
+.setup-how li b{color:#fff}
+.setup-how li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,#ff2d78,#13d4c4)}

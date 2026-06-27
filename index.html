@@ -59,71 +59,20 @@
   </header>
 
   <!-- Game chooser — shown ONLY inside the native app; hidden on the website -->
-  <div class="mode-chooser hidden" id="modeChooser">
-    <div class="mc-inner">
-      <img class="mc-logo" src="./index_files/logo.svg" alt="38-0-0">
-      <h1 class="mc-title">Choose your game</h1>
-      <div class="mc-grid">
-        <button class="mc-card mc-pvp" id="mcPvp">
-          <span class="mc-flag">⚔️</span>
-          <span class="mc-name">PvP</span>
-          <span class="mc-tag">beta</span>
-          <span class="mc-desc">Draft head to head against a player worldwide</span>
-        </button>
-        <button class="mc-card mc-epl" id="mcEpl">
-          <span class="mc-flag">🎪</span>
-          <span class="mc-name">Festival</span>
-          <span class="mc-desc">Book a perfect 38-0-0 line-up</span>
-        </button>
-        <button class="mc-card mc-laliga hidden" id="mcLaliga">
-          <span class="mc-flag">🇪🇸</span>
-          <span class="mc-name">Primera División</span>
-          <span class="mc-desc">Build a 38-0-0 Spanish League season</span>
-        </button>
-        <button class="mc-card mc-wc" id="mcWc">
-          <span class="mc-flag">🌍</span>
-          <span class="mc-name">Nations Cup</span>
-          <span class="mc-desc">Draft a squad and chase the trophy</span>
-        </button>
-        <button class="mc-card mc-ec" id="mcEc">
-          <span class="mc-flag">🇪🇺</span>
-          <span class="mc-name">European League</span>
-          <span class="mc-desc">Draft Europe's elite and win it all</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- single game mode: chooser removed -->
 
   <!-- SETUP SCREEN (mode + formation, before the first spin) -->
   <section class="setup" id="setupScreen">
     <div class="setup-inner">
-      <img class="setup-logo" src="./index_files/logo.svg" alt="38-0-0">
-      <h1 class="setup-title">Book your line-up</h1>
-      <p class="setup-sub">Pick how you play, choose your billing, then spin for 11 acts.</p>
-
-      <!-- Nations Cup cross-promo — revealed by JS for non-iOS web only (see script at end of body) -->
-      <a class="nc-promo" id="ncPromo" href="#">🎶 New: <b>three billings</b> →</a>
-
-      <div class="setup-step" id="setupModeStep">
-        <div class="setup-step-label">1 · Choose your mode</div>
-        <div class="mode-grid">
-          <button class="mode-card" data-mode="classic">
-            <span class="mode-name">Classic</span>
-            <span class="mode-desc">Full stats &amp; draw scores on show. Book the strongest bill you can.</span>
-          </button>
-          <button class="mode-card" data-mode="expert">
-            <span class="mode-name">Expert</span>
-            <span class="mode-desc">Scores &amp; stats hidden — only names &amp; genres. For real music heads.</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="setup-step hidden" id="setupFormationStep">
-        <div class="setup-step-label">2 · Choose your billing</div>
-        <div class="formation-grid" id="formationGrid"></div>
-      </div>
-
-      <button class="setup-start hidden" id="setupStart">Start booking →</button>
+      <img class="setup-logo" src="./index_files/logo.svg" alt="The Perfect Festival">
+      <h1 class="setup-title">The Perfect Festival</h1>
+      <p class="setup-sub">Spin a festival, draft the acts, and build a line-up that sells out the tour.</p>
+      <ul class="setup-how">
+        <li><b>Spin</b> a real festival &amp; year</li>
+        <li><b>Draft</b> one act onto an open stage</li>
+        <li><b>Fill</b> all 11 stages — biggest acts headline</li>
+      </ul>
+      <button class="setup-start" id="setupStart">Start booking →</button>
     </div>
   </section>
 
@@ -135,25 +84,25 @@
       <div class="spin-pane" id="spinPane">
         <div class="reels">
           <div class="reel reel-team" id="reelTeam">
-            <span class="reel-label">GENRE</span>
-            <span class="reel-value" id="reelTeamVal">POP</span>
+            <span class="reel-label">FESTIVAL</span>
+            <span class="reel-value" id="reelTeamVal">GLA</span>
           </div>
           <div class="reel reel-year" id="reelYear">
-            <span class="reel-label">ERA</span>
-            <span class="reel-value" id="reelYearVal">2023</span>
+            <span class="reel-label">YEAR</span>
+            <span class="reel-value" id="reelYearVal">2019</span>
           </div>
         </div>
-        <div class="reel-captions"><span>Genre</span><span>Era</span></div>
+        <div class="reel-captions"><span>Festival</span><span>Year</span></div>
         <button class="spin-btn" id="spinBtn">SPIN</button>
-        <p class="spin-hint" id="spinHint">Spin to draw a genre &amp; era, then draft an act.</p>
+        <p class="spin-hint" id="spinHint">Spin to draw a festival &amp; year, then draft an act.</p>
       </div>
 
       <!-- Draft sub-screen -->
       <div class="draft-pane hidden" id="draftPane">
         <div class="draft-head">
           <div class="draft-title">
-            <span id="draftTeamName">Pop</span>
-            <span class="draft-year" id="draftYear">2023</span>
+            <span id="draftTeamName">Glastonbury</span>
+            <span class="draft-year" id="draftYear">2019</span>
           </div>
           <input class="draft-search" id="draftSearch" placeholder="Search act…">
         </div>
@@ -188,9 +137,10 @@
   <!-- RESULTS SCREEN -->
   <section class="results hidden" id="resultsScreen">
     <div class="results-inner">
-      <img class="results-logo-img" src="./index_files/logo.svg" alt="38-0-0">
-      <h1 class="results-q" id="resultsQ">Can your line-up sell out all 38?</h1>
-      <div class="record-block">
+      <img class="results-logo-img" src="./index_files/logo.svg" alt="The Perfect Festival">
+      <h1 class="results-q" id="resultsQ">Your line-up</h1>
+      <div class="poster" id="resultPoster"></div>
+      <div class="record-block hidden">
         <span class="record-label">PROJECTED TOUR</span>
         <div class="record-line">
           <span class="rec-w" id="recW">0</span>
@@ -265,48 +215,44 @@
   <section class="about" id="about">
     <div class="about-inner">
       <h2>About The Perfect Festival</h2>
-      <p><strong>The Perfect Festival</strong> is a free booking game where you build an 11-slot festival
-        line-up and find out whether your bill could sell out a whole 38-show tour — a flawless 38-0-0,
-        every night packed, not a single flop. Spin for a genre and an era, draft your acts one by one,
-        and see how your dream line-up would do across the run.</p>
+      <p><strong>The Perfect Festival</strong> is a free booking game. Spin a real festival and year —
+        Glastonbury 2019, Coachella 2018, Tomorrowland — draft one act at a time from that edition, and
+        build an 11-stage line-up: three headliners and a full undercard. The game projects your bill into
+        a <strong>festival score</strong> and a touring run. Book a line-up strong enough and every date
+        sells out: a flawless, sold-out tour.</p>
 
       <h3>How it works</h3>
       <ol>
-        <li><strong>Pick your mode and billing</strong> — choose how you play and the shape of your festival.</li>
-        <li><strong>Spin</strong> to draw a random genre and era.</li>
-        <li><strong>Draft one act</strong> from that pool into an open slot on your bill.</li>
-        <li><strong>Repeat for 11 slots</strong> until the whole line-up is booked.</li>
-        <li><strong>Get your projected 38-show tour</strong> and the tier your bill earns — from an
-          Open-Mic Night all the way up to the legendary Perfect Festival.</li>
+        <li><strong>Spin</strong> to draw a real festival and year.</li>
+        <li><strong>Draft one act</strong> from that edition onto an open stage.</li>
+        <li><strong>Place your biggest acts as headliners</strong> — headline stages count for the most.</li>
+        <li><strong>Fill all 11 stages</strong> until the poster is complete.</li>
+        <li><strong>Get your festival score &amp; tour</strong> — and the tier your bill earns, from an
+          Open-Mic Night up to the legendary Perfect Festival.</li>
       </ol>
 
-      <h3>The 38-0-0 challenge</h3>
-      <p>Selling out all 38 shows is the ultimate. It is achievable, but deliberately punishing: you need
-        crowd-pulling acts in every slot, a bill with real range across genres, and very little luck to
-        spare. Most line-ups land somewhere between an open-mic scrap and a headline weekend.</p>
+      <h3>Stages</h3>
+      <p>Any act can play any stage — stages differ by <strong>size</strong>, not genre. Three headliners
+        carry the most weight, the main stages less, the undercard least. So the real decision is who you
+        put up top: a weak headliner drags the whole bill, while loading your biggest names into the
+        headline slots is what carries a line-up. The same artist can't appear twice, even across different
+        festivals. A line-up with genuine genre range also scores a little higher than a one-note bill.</p>
 
-      <h3>Billings</h3>
-      <p>Build your bill in one of three shapes: <strong>Balanced Weekend</strong>, <strong>Dance-Forward</strong>
-        and <strong>Rock-Heavy</strong>. Acts can only fill stages they genuinely fit — a house DJ slots into a
-        dance tent, a crossover star covers more than one stage — so every line-up you build hangs together.</p>
-
-      <h3>Game modes</h3>
-      <ul>
-        <li><strong>Classic</strong> — full draw scores and act stats are on show. Book the strongest bill you can.</li>
-        <li><strong>Expert</strong> — scores and stats are hidden. You see only names and genres and draft on pure
-          music knowledge. The stats, tiers and final tour are revealed at the end.</li>
-      </ul>
+      <h3>The sold-out tour</h3>
+      <p>The ultimate result is a bill so strong that it sells out every date of the tour. It is achievable
+        but deliberately rare — even a perfectly drafted line-up only manages it now and then. Most bills
+        land somewhere between a mid-bill weekend and a main-stage triumph.</p>
 
       <h3>Frequently asked questions</h3>
       <div class="faq">
         <div class="faq-q">Is The Perfect Festival free to play?</div>
         <div class="faq-a">Yes — it is completely free and runs in your browser. There is nothing to download.</div>
-        <div class="faq-q">Which acts and eras can I draw?</div>
-        <div class="faq-a">A curated pool of acts across pop, rock and indie, electronic, hip-hop and R&amp;B, spanning several eras, each with a draw score.</div>
-        <div class="faq-q">Can you really go 38-0-0?</div>
-        <div class="faq-a">Yes, but it is rare. You need top acts in every slot and a bill with genuine genre range. Most bills land between an open-mic scrap and a headline weekend.</div>
-        <div class="faq-q">How is my tour worked out?</div>
-        <div class="faq-a">Your projected 38-show tour is based on the average draw score of your line-up, plus a small bonus for spanning more genres, with a little night-to-night swing.</div>
+        <div class="faq-q">Which festivals can I draw?</div>
+        <div class="faq-a">A spread of well-known festivals and editions across rock, pop, electronic, hip-hop and R&amp;B, each with a roster of acts and a draw score. It is an unofficial fan game — line-ups are illustrative, not official.</div>
+        <div class="faq-q">Can you really sell out the whole tour?</div>
+        <div class="faq-a">Yes, but it is rare. You need top acts headlining and real range across the bill. Most line-ups land between a mid-bill weekend and a main-stage finish.</div>
+        <div class="faq-q">How is my festival score worked out?</div>
+        <div class="faq-a">It is a weighted average of your acts' draw power — headliners count most — plus a small bonus for genre range, with a little night-to-night variation on the tour.</div>
         <div class="faq-q">Do I need an account?</div>
         <div class="faq-a">No sign-up and no app needed — just spin and book.</div>
       </div>
