@@ -1,42 +1,23 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Perfect Festival">
   <defs>
     <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff2d78"/><stop offset=".5" stop-color="#7c3aed"/><stop offset="1" stop-color="#13d4c4"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#e0a51c"/>
+      <stop offset="0" stop-color="#FF5A36"/><stop offset="1" stop-color="#D8F24A"/>
     </linearGradient>
     <linearGradient id="bars" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#ff5fa2"/>
+      <stop offset="0" stop-color="#E8431F"/><stop offset="1" stop-color="#FF7A4D"/>
     </linearGradient>
-    <radialGradient id="bg" cx="50%" cy="42%" r="62%">
-      <stop offset="0" stop-color="#1b1136"/><stop offset="1" stop-color="#0a0a12"/>
-    </radialGradient>
-    <filter id="g" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
-  <circle cx="256" cy="256" r="232" fill="url(#bg)" stroke="url(#ring)" stroke-width="16"/>
-  <circle cx="256" cy="256" r="206" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-opacity=".6"/>
-  <!-- star -->
-  <path d="M256 88 l14 32 35 4 -25 24 6 35 -30 -17 -30 17 6 -35 -25 -24 35 -4 z" fill="url(#gold)" filter="url(#g)"/>
-  <!-- beams -->
-  <g opacity=".45" filter="url(#g)">
-    <path d="M256 155 L145 335 L205 335 Z" fill="#ff2d78"/>
-    <path d="M256 155 L367 335 L307 335 Z" fill="#13d4c4"/>
+  <circle cx="256" cy="256" r="232" fill="#17121A" stroke="url(#ring)" stroke-width="18"/>
+  <path d="M256 92 l14 32 35 4 -25 24 6 35 -30 -17 -30 17 6 -35 -25 -24 35 -4 z" fill="#F2B53C"/>
+  <g fill="url(#bars)">
+    <rect x="158" y="258" width="26" height="77" rx="5"/>
+    <rect x="196" y="218" width="26" height="117" rx="5"/>
+    <rect x="234" y="180" width="26" height="155" rx="5"/>
+    <rect x="276" y="202" width="26" height="133" rx="5"/>
+    <rect x="314" y="168" width="26" height="167" rx="5"/>
+    <rect x="352" y="240" width="26" height="95" rx="5"/>
   </g>
-  <!-- equalizer bars -->
-  <g fill="url(#bars)" filter="url(#g)">
-    <rect x="158" y="258" width="26" height="77" rx="7"/>
-    <rect x="196" y="218" width="26" height="117" rx="7"/>
-    <rect x="234" y="180" width="26" height="155" rx="7"/>
-    <rect x="276" y="202" width="26" height="133" rx="7"/>
-    <rect x="314" y="168" width="26" height="167" rx="7"/>
-    <rect x="352" y="240" width="26" height="95" rx="7"/>
-  </g>
-  <!-- stage floor -->
-  <rect x="140" y="335" width="232" height="11" rx="5" fill="url(#gold)" opacity=".9"/>
-  <!-- wordmark -->
-  <text x="256" y="400" text-anchor="middle" font-family="'Bebas Neue',Inter,sans-serif"
-        font-size="44" letter-spacing="8" fill="#fff" opacity=".95">FESTIVAL</text>
+  <rect x="150" y="338" width="212" height="9" rx="2" fill="#D8F24A"/>
+  <text x="256" y="404" text-anchor="middle" font-family="Anton, Impact, sans-serif"
+        font-size="52" letter-spacing="3" fill="#F4EEE0">FESTIVAL</text>
 </svg>

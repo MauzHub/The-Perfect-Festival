@@ -937,57 +937,13 @@ function honourLabel(r){
 // read differently. No em dashes. Needs r.position (set by populateBreakdown) before it is called.
 function recapText(r){
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
-  const key = bandTier(r.aS);
-  const head = {
-    WOAT: ["A line-up nobody showed up for — the lowest-drawing act bookable in every slot.",
-           "Bottom of every bill. Somehow the worst possible festival you could put together.",
-           "Cancelled in spirit. Not one name anyone would cross the road for."],
-    GOAT: ["Perfection. A bill so stacked it belongs in festival folklore.",
-           "The dream line-up — flawless from the headliners to the smallest tent.",
-           "Untouchable. Every stage a headliner could play. A perfect festival."],
-    INVINCIBLES: ["A legendary line-up — top to bottom, barely a weak slot on the poster.",
-                  "Heavyweight billing. The kind of poster people screenshot.",
-                  "An all-killer bill that any promoter would kill to book."],
-    CENTURIONS: ["A genuine headline act — relentless star power across the weekend.",
-                 "Box-office from the first name to the last. A serious bill.",
-                 "Star-studded and stacked. This one sells itself."],
-    CHAMPIONS: ["Headliners. A poster that tops any main stage.",
-                "Top billing, with the names to back it up.",
-                "A commanding bill that closes the main stage."],
-    'CHAMPIONS LEAGUE': ["A main-stage line-up promoters would fight over.",
-                         "Comfortably a main-stage bill.",
-                         "Solid main-stage billing across the board."],
-    EUROPA: ["A big-top bill — respectable, the right side of the poster.",
-             "Second-stage billing and a decent weekend's work.",
-             "A steady big-top line-up."],
-    'MID-TABLE': ["Mid-bill and middling. On the poster, in the small print.",
-                  "A forgettable bill stuck in the middle of the line-up.",
-                  "Mid-bill filler — comfortable, unremarkable."],
-    RELEGATION: ["An open-mic scrap — just getting names on the poster.",
-                 "A bill staring at half-empty rooms.",
-                 "A grim fight to fill the smallest tent."],
-    DERBY: ["Historically thin. A poster best left in the drafts folder.",
-            "An empty field of a line-up. Pure tumbleweed.",
-            "An all-time weak bill, out of its depth from the start."]
-  }[key];
-  const expD = finishDesc(r.expRank), actD = finishDesc(r.actRank);
-  const verdict = pick({
-    OVERPERFORMED: [`On paper this bill was rated only for ${expD}, so ${actD} is a genuine overachievement.`,
-                    `Few would have backed them for more than ${expD}; ${actD} blew that forecast away.`,
-                    `Tipped merely for ${expD}, they soared to ${actD}.`],
-    UNDERPERFORMED: [`A line-up rated for ${expD} that could only manage ${actD}. An underachievement, plain and simple.`,
-                     `They had the names for ${expD}, which makes ${actD} a chastening return.`,
-                     `Rated for ${expD}, they fell away to ${actD}, and it will sting.`],
-    'MET EXPECTATIONS': [`Rated for ${expD}, and that is precisely what they delivered. No fluke, no collapse.`,
-                         `Tipped for ${expD}, and they saw it through, no more and no less.`,
-                         `Par for this bill: ${expD}, and they delivered exactly that.`]
-  }[r.verdict]);
+  const cv = r.critic || (r.critic = criticVerdict(r));
   const ts = topScorer(r.rows, r), star = topPlayer(r.rows).pick.player;
   const bud = state.budget || BUDGET, sp = spent();
   const numbers = pick([
-    `Final festival score: ${r.S}, booked for ${fmtMoney(sp)} of a ${fmtMoney(bud)} budget.`,
-    `A ${r.S}-rated bill, put together for ${fmtMoney(sp)} — ${fmtMoney(bud - sp)} left in the kitty.`,
-    `Score ${r.S}, and ${sp <= bud * 0.8 ? 'shrewdly' : 'only just'} kept inside the ${fmtMoney(bud)} budget.`
+    `Booked for ${fmtMoney(sp)} of a ${fmtMoney(bud)} budget.`,
+    `Put together for ${fmtMoney(sp)} — ${fmtMoney(bud - sp)} left in the kitty.`,
+    `${sp <= bud * 0.8 ? 'Shrewdly' : 'Only just'} kept inside the ${fmtMoney(bud)} budget.`
   ]);
   const rng = r.famCount >= 5 ? ' Five genres deep, the bill had real range.'
             : r.famCount <= 2 ? ' A one-note bill, and it showed.' : '';
@@ -996,8 +952,36 @@ function recapText(r){
     `${star.n} (${star.o}) led the way, and ${ts.row.pick.player.n} drew the biggest crowd at ${ts.goals}k.`,
     `Act of the festival was ${star.n} (${star.o}); ${ts.row.pick.player.n} pulled the biggest crowd, ${ts.goals}k.`
   ]);
-  return `${pick(head)} ${verdict} ${numbers}${rng} ${stars}`;
+  return `“${cv.quote}” ${cv.swing} ${numbers}${rng} ${stars}`;
 }
+
+// Critic verdict: a star rating + a quotable pull-quote + a fictional outlet, plus a "poster vs reality"
+// swing line driven by whether the weekend over/under-performed the bill on paper.
+const CRITIC_OUTLETS = ['THE FESTIVAL WIRE', 'STAGE & FIELD', 'BACKSTAGE', 'THE WRISTBAND', 'ENCORE', 'SOUNDCHECK'];
+function criticVerdict(r){
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const key = bandTier(r.aS);
+  const STARS = { GOAT:5, INVINCIBLES:5, CENTURIONS:4, CHAMPIONS:4, 'CHAMPIONS LEAGUE':3, EUROPA:3, 'MID-TABLE':2, RELEGATION:1, WOAT:1, DERBY:1 };
+  const QUOTES = {
+    GOAT: ['The line-up of the decade.', 'Festival history, booked in an afternoon.', 'Flawless — nothing else comes close.'],
+    INVINCIBLES: ['An all-timer. People will lie about being there.', 'A poster for the ages.', 'Heavyweight from the first name to the last.'],
+    CENTURIONS: ['Serious star power, top to bottom.', 'Box-office on every single stage.', 'A bill that sells itself.'],
+    CHAMPIONS: ['A poster that owns the main stage.', 'Top billing, and it earns it.', 'This one closes the main stage.'],
+    'CHAMPIONS LEAGUE': ['A proper main-stage weekend.', 'Solid, with real highlights.', 'A main-stage bill, no complaints.'],
+    EUROPA: ['Respectable, if a little safe.', 'A decent weekend’s work.', 'Just on the right side of the poster.'],
+    'MID-TABLE': ['Fine. Forgotten by September.', 'Mid-bill and middling.', 'You stop reading the poster halfway down.'],
+    RELEGATION: ['Did anyone actually play?', 'A bill best left in the drafts.', 'Half-empty fields, and you can see why.'],
+    WOAT: ['How was this booked on purpose?', 'A poster with nothing on it.', 'Outnumbered, just about, by the staff.'],
+    DERBY: ['Out of its depth from the first note.', 'A line-up running on fumes.', 'Tumbleweed across an empty field.']
+  };
+  const swing = pick({
+    OVERPERFORMED: ['Better than the poster promised.', 'It punched well above the bill.', 'The weekend outdid the line-up on paper.'],
+    UNDERPERFORMED: ['Looked bigger on the poster.', 'It flattered to deceive.', 'Never quite lived up to the poster.'],
+    'MET EXPECTATIONS': ['Exactly as billed.', 'Just what the poster promised.', 'No surprises — it delivered what it advertised.']
+  }[r.verdict]);
+  return { stars: STARS[key] || 3, quote: pick(QUOTES[key] || QUOTES['MID-TABLE']), outlet: pick(CRITIC_OUTLETS), swing };
+}
+function starString(n){ return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
 
 /* ============================================================
    Results
@@ -1067,8 +1051,9 @@ function showResults(){
 
   // Season recap: verdict (over / met / under) + correspondent summary + star player & top scorer.
   const rv = $('recapVerdict');
-  rv.className = 'recap-verdict ' + (r.verdict === 'OVERPERFORMED' ? 'over' : r.verdict === 'UNDERPERFORMED' ? 'under' : 'met');
-  rv.textContent = r.verdict;
+  const cv = r.critic || (r.critic = criticVerdict(r));
+  rv.className = 'recap-verdict critic ' + (cv.stars >= 4 ? 'over' : cv.stars <= 2 ? 'under' : 'met');
+  rv.innerHTML = `<span class="rv-stars">${starString(cv.stars)}</span><span class="rv-outlet">${cv.outlet}</span>`;
   $('recapText').textContent = recapText(r);
   const star = topPlayer(r.rows).pick, ts = topScorer(r.rows, r);
   $('recapStar').textContent = `${star.player.n} · ${star.player.o}`;
@@ -1081,7 +1066,7 @@ function showResults(){
 
   $('breakdown').classList.add('hidden');
   $('showMoreBtn').classList.remove('hidden');
-  $('showMoreBtn').textContent = 'Show full tour breakdown ▾';
+  $('showMoreBtn').textContent = 'Show full festival breakdown ▾';
 
   // The quadruple is the rarest result — celebrate it up top, not hidden behind "Show more".
   $('quadBanner').classList.toggle('hidden', !r.isQuad);
@@ -1520,7 +1505,7 @@ async function boot(){
   $('shareBtn').addEventListener('click', shareResult);
   $('showMoreBtn').addEventListener('click', () => {
     const open = !$('breakdown').classList.toggle('hidden');
-    $('showMoreBtn').textContent = open ? 'Hide breakdown ▴' : 'Show full tour breakdown ▾';
+    $('showMoreBtn').textContent = open ? 'Hide breakdown ▴' : 'Show full festival breakdown ▾';
     if (open){
       track('breakdown_opened', { rating: state.result && state.result.S });
       $('breakdown').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
