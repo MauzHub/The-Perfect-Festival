@@ -16,18 +16,18 @@ const FORMATIONS = {
   // ONE billing. Stages are tiered by SIZE, not genre — any act can play any stage. Weight drives how
   // much a stage counts toward the score (headliners matter most). Laid out as a poster, top->bottom.
   'main': { name:'The Line-up', slots:[
-    {id:'HF', label:'Friday',   fam:'ANY', tier:1, weight:1.4, x:22, y:14},
-    {id:'HS', label:'Saturday', fam:'ANY', tier:1, weight:1.4, x:50, y:14},
-    {id:'HU', label:'Sunday',   fam:'ANY', tier:1, weight:1.4, x:78, y:14},
-    {id:'M1', label:'Main',     fam:'ANY', tier:2, weight:1.0, x:22, y:38},
-    {id:'M2', label:'Park',     fam:'ANY', tier:2, weight:1.0, x:50, y:38},
-    {id:'M3', label:'River',    fam:'ANY', tier:2, weight:1.0, x:78, y:38},
-    {id:'U1', label:'Tent',     fam:'ANY', tier:3, weight:0.7, x:22, y:62},
-    {id:'U2', label:'Glade',    fam:'ANY', tier:3, weight:0.7, x:50, y:62},
-    {id:'U3', label:'Field',    fam:'ANY', tier:3, weight:0.7, x:78, y:62},
-    {id:'U4', label:'Sunset',   fam:'ANY', tier:3, weight:0.7, x:22, y:86},
-    {id:'U5', label:'Grove',    fam:'ANY', tier:3, weight:0.7, x:50, y:86},
-    {id:'U6', label:'Late',     fam:'ANY', tier:3, weight:0.7, x:78, y:86},
+    {id:'FH', day:'Friday',   role:'Headliner', label:'Friday',   fam:'ANY', tier:1, weight:1.4},
+    {id:'FM', day:'Friday',   role:'Main Stage',label:'Main',     fam:'ANY', tier:2, weight:1.0},
+    {id:'FT', day:'Friday',   role:'The Tent',  label:'Tent',     fam:'ANY', tier:3, weight:0.7},
+    {id:'FL', day:'Friday',   role:'Late Night',label:'Late',     fam:'ANY', tier:3, weight:0.7},
+    {id:'SH', day:'Saturday', role:'Headliner', label:'Saturday', fam:'ANY', tier:1, weight:1.4},
+    {id:'SM', day:'Saturday', role:'Main Stage',label:'Main',     fam:'ANY', tier:2, weight:1.0},
+    {id:'ST', day:'Saturday', role:'The Tent',  label:'Tent',     fam:'ANY', tier:3, weight:0.7},
+    {id:'SL', day:'Saturday', role:'Late Night',label:'Late',     fam:'ANY', tier:3, weight:0.7},
+    {id:'UH', day:'Sunday',   role:'Headliner', label:'Sunday',   fam:'ANY', tier:1, weight:1.4},
+    {id:'UM', day:'Sunday',   role:'Main Stage',label:'Main',     fam:'ANY', tier:2, weight:1.0},
+    {id:'UT', day:'Sunday',   role:'The Tent',  label:'Tent',     fam:'ANY', tier:3, weight:0.7},
+    {id:'UL', day:'Sunday',   role:'Late Night',label:'Late',     fam:'ANY', tier:3, weight:0.7},
   ]},
 };
 
@@ -231,16 +231,15 @@ function startGame(mode, formationKey){
             budget: BUDGET };
   updateBudgetUI();
   document.body.classList.toggle('mode-expert', mode === 'expert');
-  $('formationTag').textContent = f.name;
   $('setupScreen').classList.add('hidden');
   $('resultsScreen').classList.add('hidden');
   $('gameScreen').classList.remove('hidden');
-  $('draftPane').classList.add('hidden');
-  $('spinPane').classList.remove('hidden');
-  $('spinBtn').disabled = false;
-  $('spinHint').textContent = 'Spin a festival & year, then draft an act.';
+  const _sb = $('spinBtn'); if (_sb) _sb.disabled = false;
+  const _hh = $('handHint'); if (_hh) _hh.textContent = 'Spin to deal a festival, then place an act on a day.';
   ensureMoveStyles();
   buildPitch();
+  renderPlayerList('');
+  updateBudgetUI();
   updateRoundPill();
   window.scrollTo(0, 0);   // start at the top so the SPIN button is in view (mobile)
   track('game_start', { mode, formation: formationKey });
@@ -255,46 +254,52 @@ function countPicks(){ return Object.keys(state.picks).length; }
    Pitch
    ============================================================ */
 function buildPitch(){
-  const pitch = $('pitch');
-  pitch.querySelectorAll('.slot').forEach(n => n.remove());
-  SLOTS.forEach(slot => {
-    const el = document.createElement('div');
-    el.className = 'slot open';
-    el.style.left = slot.x + '%';
-    el.style.top = slot.y + '%';
-    el.dataset.slot = slot.id;
-    el.dataset.tier = slot.tier || 3;
-    el.innerHTML = `<div class="slot-node">${slot.label}</div>`;
-    el.addEventListener('click', () => onSlotClick(slot.id));
-    pitch.appendChild(el);
+  const planner = $('planner');
+  if (!planner) return;
+  planner.innerHTML = '';
+  ['Friday','Saturday','Sunday'].forEach(day => {
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.innerHTML = `<div class="day-head">${day}</div>`;
+    SLOTS.filter(s => s.day === day).forEach(slot => {
+      const el = document.createElement('div');
+      el.className = 'slot open';
+      el.dataset.slot = slot.id;
+      el.dataset.tier = slot.tier || 3;
+      el.dataset.role = slot.role;
+      el.addEventListener('click', () => onSlotClick(slot.id));
+      col.appendChild(el);
+    });
+    planner.appendChild(col);
   });
   refreshPitch();
 }
 function refreshPitch(){
   let armedSet = new Set();
-  if (state.selectedIdx !== null){
-    const p = state.current.players[state.selectedIdx];
-    armedSet = new Set(playerOpenSlots(p).map(s => s.id));
+  if (state.selectedIdx !== null && state.current){
+    armedSet = new Set(playerOpenSlots(state.current.players[state.selectedIdx]).map(s => s.id));
   } else if (state.moving){
     armedSet = new Set(playerOpenSlots(state.picks[state.moving].player).map(s => s.id));
   }
   SLOTS.forEach(slot => {
     const el = document.querySelector(`.slot[data-slot="${slot.id}"]`);
+    if (!el) return;
     const pick = state.picks[slot.id];
-    el.classList.toggle('armed', armedSet.has(slot.id));
+    const armed = armedSet.has(slot.id);
+    el.classList.toggle('armed', armed);
     el.classList.toggle('moving', state.moving === slot.id);
     if (pick){
-      el.classList.remove('open');
-      el.classList.add('filled');
+      el.classList.remove('open'); el.classList.add('filled');
       const p = pick.player;
       el.innerHTML =
-        `<div class="slot-node">${jerseySVG(pick.team, initials(p.n), 58)}` +
-        `<span class="slot-ov">${p.o}</span></div>` +
-        `<span class="slot-name">${p.n}</span>`;
+        `<span class="slot-role">${slot.role}</span>` +
+        `<span class="slot-name">${p.n}</span>` +
+        `<span class="slot-fee">${fmtMoney(p.cost||0)}</span>`;
     } else {
-      el.classList.add('open');
-      el.classList.remove('filled');
-      el.innerHTML = `<div class="slot-node">${slot.label}</div>`;
+      el.classList.add('open'); el.classList.remove('filled');
+      el.innerHTML =
+        `<span class="slot-role">${slot.role}</span>` +
+        `<span class="slot-drop">${armed ? 'tap to book' : 'open'}</span>`;
     }
   });
 }
@@ -303,9 +308,7 @@ function ensureMoveStyles(){
   if (document.getElementById('moveStyles')) return;
   const s = document.createElement('style'); s.id = 'moveStyles';
   s.textContent = '.slot.filled{cursor:pointer}'
-    + '.slot.filled .slot-node{transition:transform .12s ease,box-shadow .12s ease}'
-    + '.slot.filled:hover .slot-node{transform:translateY(-3px)}'
-    + '.slot.moving .slot-node{transform:translateY(-7px) scale(1.1);box-shadow:0 0 0 5px rgba(255,45,120,.34),0 10px 22px rgba(0,0,0,.5)}';
+    + '.slot.moving{box-shadow:0 0 0 3px rgba(255,90,54,.55) !important}';
   document.head.appendChild(s);
 }
 function startMove(slotId){
@@ -316,7 +319,7 @@ function startMove(slotId){
   state.moving = slotId; state.selectedIdx = null;
   if (window.NativeAds && NativeAds.haptic) NativeAds.haptic('LIGHT');
   toast(`Moving ${p.n}. Tap a highlighted spot.`);
-  if (state.current) renderPlayerList($('draftSearch').value);
+  if (state.current) renderPlayerList('');
   refreshPitch(); updateInstruct();
 }
 function moveTo(slotId){
@@ -349,14 +352,12 @@ function onSlotClick(slotId){
 
   if (countPicks() >= TOTAL_ROUNDS){ showResults(); return; }
 
-  $('draftPane').classList.add('hidden');
-  $('spinPane').classList.remove('hidden');
-  $('spinBtn').disabled = false;
-  $('spinHint').textContent = `${countPicks()}/${TOTAL_ROUNDS} slots booked — spin for the next.`;
+  renderPlayerList('');
+  refreshPitch();
   updateRoundPill();
   updateBudgetUI();
-  refreshPitch();
-  if (window.innerWidth <= 900) window.scrollTo({ top: 0, behavior: 'smooth' });
+  const _sb = $('spinBtn'); if (_sb) _sb.disabled = false;
+  updateInstruct();
 }
 
 /* ============================================================
@@ -366,31 +367,17 @@ function spin(isRespin){
   if (state.spinning) return;
   state.spinning = true;
   if (window.NativeAds) NativeAds.haptic('LIGHT');
-  if (!isRespin){ spinCount++; }  // re-spin allowance is ONCE PER GAME (reset only in startGame)
-  $('spinBtn').disabled = true;
-  $('spinHint').textContent = 'SPINNING…';
-  $('reelTeam').classList.add('spinning');
-  $('reelYear').classList.add('spinning');
-
+  if (!isRespin){ spinCount++; }
+  const btn = $('spinBtn'); if (btn) btn.disabled = true;
+  const h = $('handHint'); if (h) h.textContent = 'Dealing a festival…';
+  const tray = $('handTray'); if (tray) tray.classList.add('dealing');
   const combo = pickCombo();
-  const teamCodes = Object.keys(DATA.teams);
-  let ticks = 0;
-  const total = 22 + Math.floor(Math.random()*8);
-  const iv = setInterval(() => {
-    ticks++;
-    $('reelTeamVal').textContent = rand(teamCodes);
-    $('reelYearVal').textContent = rand(DATA.years);
-    if (ticks >= total){
-      clearInterval(iv);
-      $('reelTeamVal').textContent = combo[0];
-      $('reelYearVal').textContent = combo[1];
-      $('reelTeam').classList.remove('spinning');
-      $('reelYear').classList.remove('spinning');
-      state.spinning = false;
-      track(isRespin ? 'respin_used' : 'spin', { round: countPicks() + 1, team: combo[0], year: combo[1] });
-      openDraft(combo[0], combo[1]);
-    }
-  }, 55);
+  setTimeout(() => {
+    state.spinning = false;
+    if (tray) tray.classList.remove('dealing');
+    track(isRespin ? 'respin_used' : 'spin', { round: countPicks() + 1, team: combo[0], year: combo[1] });
+    openDraft(combo[0], combo[1]);
+  }, 280);
 }
 
 /* ---------- donation popup ---------- */
@@ -454,10 +441,11 @@ function showSocialsModal(){ return; /* disabled */
 
 // Re-spin is available with rewarded ads (web flag), a native AdMob build, or "Remove Ads".
 function refreshRespinBtn(){
+  const rb = $('respinBtn'); if (!rb) return;
   const enabled = REWARDED_ADS_LIVE
     || !!(window.NativeAds && NativeAds.available())
     || !!(window.IAP && IAP.hasNoAds());
-  $('respinBtn').classList.toggle('hidden', !enabled || state.respinUsed);
+  rb.classList.toggle('hidden', !enabled || state.respinUsed);
   // Always set BOTH states so the label can never get stuck on "(free)" for a non-paying user.
   $('respinBtn').textContent = (window.IAP && IAP.hasNoAds())
     ? '🔄 Re-spin the genre (free)'
@@ -509,7 +497,7 @@ function updateIapUI(){
 // Watch a rewarded ad to re-spin the current genre/era (once per game).
 function rewardedRespin(){
   if (state.spinning || state.respinUsed) return;
-  const btn = $('respinBtn');
+  const btn = $('respinBtn'); if (!btn) return;
   const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Loading ad…';
@@ -534,37 +522,26 @@ function rewardedRespin(){
    ============================================================ */
 function openDraft(teamCode, year){
   const players = (DATA.squads[`${teamCode}|${year}`] || []).slice();
-  // Classic: keep the data's overall-sorted order (best first). Expert: sort by position so
-  // the hidden ratings aren't given away by list order.
   if (state.expert) players.sort((a, b) => posRank(a) - posRank(b) || a.n.localeCompare(b.n));
   state.current = { team: teamCode, year, players };
   state.selectedIdx = null;
 
-  // If nobody in this squad fits an open slot (or all already used), re-spin.
-  const anyPlayable = players.some(p => !isUsed(p) && playerOpenSlots(p).length > 0);
+  // If nothing here fits an open slot AND is affordable, deal again.
+  const anyPlayable = players.some(p => !isUsed(p) && playerOpenSlots(p).length > 0 && canAfford(p));
   if (!anyPlayable){
-    $('spinPane').classList.remove('hidden');
-    $('draftPane').classList.add('hidden');
-    $('spinBtn').disabled = false;
-    $('spinHint').textContent =
-      `Every act from ${DATA.teams[teamCode].name} ${year} is already booked — spin again.`;
+    state.current = null;
+    const btn = $('spinBtn'); if (btn) btn.disabled = false;
+    const h = $('handHint'); if (h) h.textContent =
+      `Every affordable act from ${DATA.teams[teamCode].name} ${year} is booked — spin again.`;
+    renderPlayerList('');
     return;
   }
 
-  const team = DATA.teams[teamCode];
-  $('draftTeamName').textContent = team.name;
-  $('draftYear').textContent = year;
-  $('draftSearch').value = '';
-
   renderPlayerList('');
   updateInstruct();
-  refreshRespinBtn();
-  $('spinPane').classList.add('hidden');
-  $('draftPane').classList.remove('hidden');
   refreshPitch();
-  // On mobile the pitch sits on top — bring the squad list into view to pick.
   if (window.innerWidth <= 900){
-    $('draftPane').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const tray = $('handTray'); if (tray) tray.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 function remainingSlotsLabel(){
@@ -572,51 +549,50 @@ function remainingSlotsLabel(){
   return `${openSlots().length} spots left (${uniq.join(', ')})`;
 }
 function updateInstruct(){
+  const h = $('handHint'); if (!h) return;
   if (state.moving){
-    $('draftInstruct').textContent = `Moving ${state.picks[state.moving].player.n}. Tap a highlighted spot, or tap him again to cancel.`;
-  } else if (state.selectedIdx !== null){
-    const p = state.current.players[state.selectedIdx];
-    $('draftInstruct').textContent = `${p.n} selected. Tap a highlighted stage spot.`;
+    h.textContent = `Moving ${state.picks[state.moving].player.n} — tap a highlighted slot, or tap it again to cancel.`;
+  } else if (state.selectedIdx !== null && state.current){
+    h.textContent = `Place ${state.current.players[state.selectedIdx].n} — tap a highlighted slot on a day.`;
+  } else if (state.current){
+    h.textContent = `Pick an act from your hand, or tap a booked slot to move it.`;
   } else {
-    $('draftInstruct').textContent = `Pick an act, or tap one on the poster to move it. ${remainingSlotsLabel()}.`;
+    h.textContent = `${countPicks()}/${TOTAL_ROUNDS} booked — spin to deal the next festival.`;
   }
 }
+function bandClass(o){ return o >= 85 ? ' band-hi' : o >= 75 ? ' band-mid' : ' band-lo'; }
 function renderPlayerList(filter){
   updateBudgetUI();
-  const list = $('playerList');
+  const list = $('handCards');
+  if (!list) return;
   list.innerHTML = '';
-  const f = (filter || '').toLowerCase();
-  const { team, players } = state.current;
-
-  players
-    .filter(p => !f || p.n.toLowerCase().includes(f))
-    .forEach((p) => {
-      const realIdx = players.indexOf(p);
-      const used = isUsed(p);
-      const eligible = !used && playerOpenSlots(p).length > 0 && canAfford(p);
-      const row = document.createElement('div');
-      row.className = 'prow'
-        + (used ? ' ineligible' : '')
-        + (!used && !eligible ? ' ineligible' : '')
-        + (state.selectedIdx === realIdx ? ' selected' : '');
-      const posTag = (p.p && p.p[0]) ? p.p[0] : '—';
-      const tooExpensive = !used && !canAfford(p);
-      const usedTag = used ? ' · already on the bill' : (tooExpensive ? ' · over budget' : '');
-      row.innerHTML =
-        `<div class="prow-face">${jerseySVG(team, initials(p.n), 40)}</div>` +
-        `<div class="prow-id">
-           <div class="prow-name">${p.n}</div>
-           <div class="prow-meta"><span class="prow-pos">${(p.p||[]).join('/')||posTag}</span>${usedTag}</div>
-         </div>
-         <div class="prow-cost ${tooExpensive ? 'over' : ''}">${fmtMoney(p.cost||0)}</div>
-         <div class="prow-ov ${ovClass(p.o)}">${p.o}</div>`;
-      if (eligible) row.addEventListener('click', () => selectPlayer(realIdx));
-      list.appendChild(row);
-    });
-
-  if (!list.children.length){
-    list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted)">No players match.</div>`;
-  }
+  if (!state.current){ updateInstruct(); return; }
+  const { players } = state.current;
+  const src = `${DATA.teams[state.current.team].name} ${state.current.year}`;
+  players.forEach((p) => {
+    const realIdx = players.indexOf(p);
+    const used = isUsed(p);
+    const tooExpensive = !used && !canAfford(p);
+    const eligible = !used && playerOpenSlots(p).length > 0 && canAfford(p);
+    const card = document.createElement('div');
+    card.className = 'act-card' + bandClass(p.o)
+      + (used ? ' is-used' : '')
+      + (tooExpensive ? ' is-over' : '')
+      + (state.selectedIdx === realIdx ? ' selected' : '');
+    const tag = used ? 'booked' : (tooExpensive ? 'over budget'
+      : ((p.p && p.p[0]) ? p.p.slice(0,2).join(' · ') : 'act'));
+    card.innerHTML =
+      `<div class="ac-band"></div>` +
+      `<div class="ac-body">` +
+        `<div class="ac-name">${p.n}</div>` +
+        `<div class="ac-src">${src}</div>` +
+        `<div class="ac-stats"><span class="ac-draw"><b>${p.o}</b><i>draw</i></span>` +
+          `<span class="ac-fee"><b>${fmtMoney(p.cost||0)}</b><i>fee</i></span></div>` +
+        `<div class="ac-tag">${tag}</div>` +
+      `</div>`;
+    if (eligible) card.addEventListener('click', () => selectPlayer(realIdx));
+    list.appendChild(card);
+  });
 }
 function stat(p, key){ const v = p[key]; return v > 0 ? v : '–'; }
 function updateBudgetUI(){
@@ -636,16 +612,45 @@ function updateBudgetUI(){
   } else if (of){
     of.textContent = 'of ' + fmtMoney(bud);
   }
+  renderLedger();
+}
+
+function projectedScore(){
+  const picks = Object.values(state.picks);
+  if (!picks.length) return null;
+  let wsum = 0, num = 0;
+  picks.forEach(pk => { const slot = slotById(pk.slotId); const w = slot ? slot.weight : 1; wsum += w; num += w * pk.player.o; });
+  return wsum ? num / wsum : null;
+}
+function bandStars(score){
+  const m = { GOAT:5, INVINCIBLES:5, CENTURIONS:4, CHAMPIONS:4, 'CHAMPIONS LEAGUE':3, EUROPA:3, 'MID-TABLE':2, RELEGATION:1, WOAT:1, DERBY:1 };
+  return m[bandTier(score)] || 2;
+}
+function renderLedger(){
+  const led = $('ledger'); if (!led) return;
+  const bud = state.budget || BUDGET, left = remaining(), used = spent();
+  const booked = countPicks(), done = booked >= TOTAL_ROUNDS;
+  const proj = projectedScore();
+  const shown = proj != null ? proj.toFixed(1) : '—';
+  const stars = proj != null ? starString(bandStars(proj)) : '☆☆☆☆☆';
+  const lowLeft = left <= (SLOTS.length - booked) * MONEY_UNIT * 6;
+  led.innerHTML =
+    `<div class="lg-h">Booking ledger</div>` +
+    `<div class="lg-ln"><span>Budget</span><b>${fmtMoney(bud)}</b></div>` +
+    `<div class="lg-ln"><span>Spent</span><b>${fmtMoney(used)}</b></div>` +
+    `<div class="lg-ln"><span>Left</span><b class="${lowLeft ? 'lg-low' : ''}">${fmtMoney(left)}</b></div>` +
+    `<div class="lg-ln"><span>Acts</span><b>${booked} / ${TOTAL_ROUNDS}</b></div>` +
+    `<div class="lg-score"><div class="lg-num">${shown}</div><div class="lg-lbl">${done ? 'festival score' : 'projected score'}</div></div>` +
+    `<div class="lg-stamp">${stars}</div>`;
 }
 
 function selectPlayer(idx){
   state.selectedIdx = (state.selectedIdx === idx) ? null : idx;
-  renderPlayerList($('draftSearch').value);
+  renderPlayerList('');
   updateInstruct();
   refreshPitch();
-  // On mobile, bring the pitch into view so the highlighted slots are tappable.
   if (state.selectedIdx !== null && window.innerWidth <= 900){
-    $('pitch').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const pl = $('planner'); if (pl) pl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
@@ -1001,16 +1006,21 @@ function renderResultPoster(r){
   const under = (byTier[3] || []).map(row => row.pick.player.n);
   const half = Math.ceil(under.length / 2);
   const body = lineOf(main, 'pr-a') + lineOf(under.slice(0, half), 'pr-b') + lineOf(under.slice(half), 'pr-c');
-  const billing = (FORMATIONS[state.formation] || {}).name || '';
+  const cv = r.critic || (r.critic = criticVerdict(r));
   return `
-    <div class="poster-kicker">THE PERFECT FESTIVAL · EST. 2026</div>
-    <div class="poster-sub-top">${esc(billing)} · 3 DAYS · 12 STAGES</div>
-    <div class="poster-headliners">${hl}</div>
-    <div class="poster-body">${body}</div>
-    <div class="poster-foot">
-      <span class="poster-tier" style="background:${tier.color}">${tier.name}</span>
-      <span class="poster-score">${r.S}<small>festival score</small></span>
-      <span class="poster-sold">${fmtMoney(spent())} of ${fmtMoney(state.budget||BUDGET)} spent</span>
+    <div class="poster-paper">
+      <div class="poster-brand">THE PERFECT<br>FESTIVAL</div>
+      <div class="poster-cred">Est. 2026 · Three days · Twelve stages · One weekend</div>
+      <div class="poster-rule"></div>
+      <div class="poster-headliners">${hl}</div>
+      <div class="poster-body">${body}</div>
+      <div class="poster-rule"></div>
+      <div class="poster-quote">“${esc(cv.quote)}”<span>${starString(cv.stars)} · ${esc(cv.outlet)}</span></div>
+      <div class="poster-foot">
+        <span class="poster-tier" style="background:${tier.color}">${esc(tier.name)}</span>
+        <span class="poster-score">${r.S}<small>festival score</small></span>
+        <span class="poster-sold">${fmtMoney(spent())} of ${fmtMoney(state.budget||BUDGET)} spent</span>
+      </div>
     </div>`;
 }
 
@@ -1482,7 +1492,7 @@ async function boot(){
     return;
   }
   $('spinBtn').addEventListener('click', () => spin(false));
-  $('respinBtn').addEventListener('click', rewardedRespin);
+  { const rb = $('respinBtn'); if (rb) rb.addEventListener('click', rewardedRespin); }
   $('resetBtn').addEventListener('click', () => { if (confirm('Start a new XI?')) showSetup(); });
 
   // Setup screen: a single Start button (mode = classic, one billing — no extra choices).
@@ -1511,7 +1521,7 @@ async function boot(){
       $('breakdown').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
-  $('draftSearch').addEventListener('input', (e) => renderPlayerList(e.target.value));
+  { const ds = $('draftSearch'); if (ds) ds.addEventListener('input', (e) => renderPlayerList(e.target.value)); }
 
   // In-app purchase: Remove Ads
   $('removeAdsBtn').addEventListener('click', () => {

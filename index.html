@@ -70,60 +70,17 @@
 
   <!-- GAME SCREEN -->
   <main class="game hidden" id="gameScreen">
-    <!-- LEFT: spin + draft -->
-    <section class="left-col">
-      <!-- Spin sub-screen -->
-      <div class="spin-pane" id="spinPane">
-        <div class="reels">
-          <div class="reel reel-team" id="reelTeam">
-            <span class="reel-label">FESTIVAL</span>
-            <span class="reel-value" id="reelTeamVal">GLA</span>
-          </div>
-          <div class="reel reel-year" id="reelYear">
-            <span class="reel-label">YEAR</span>
-            <span class="reel-value" id="reelYearVal">2019</span>
-          </div>
-        </div>
-        <div class="reel-captions"><span>Festival</span><span>Year</span></div>
-        <button class="spin-btn" id="spinBtn">SPIN</button>
-        <p class="spin-hint" id="spinHint">Spin to draw a festival &amp; year, then draft an act.</p>
+    <div class="desk">
+      <div class="planner" id="planner"></div>
+      <aside class="ledger" id="ledger"></aside>
+    </div>
+    <div class="hand" id="handTray">
+      <div class="hand-rail">
+        <button class="spin-deck" id="spinBtn"><span class="sd-l">SPIN</span><span class="sd-s">deal a festival</span></button>
+        <div class="hand-cards" id="handCards"></div>
       </div>
-
-      <!-- Draft sub-screen -->
-      <div class="draft-pane hidden" id="draftPane">
-        <div class="draft-head">
-          <div class="draft-title">
-            <span id="draftTeamName">Glastonbury</span>
-            <span class="draft-year" id="draftYear">2019</span>
-          </div>
-          <input class="draft-search" id="draftSearch" placeholder="Search act…">
-        </div>
-        <div class="draft-subhead">
-          <span class="draft-instruct" id="draftInstruct">Pick an act for your bill</span>
-          <span class="draft-cols">
-            <i class="cost">COST</i><i class="ov">PULL</i>
-          </span>
-        </div>
-        <button class="respin-btn hidden" id="respinBtn">🎬 Re-spin the genre (watch an ad)</button>
-        <div class="player-list" id="playerList"></div>
-      </div>
-    </section>
-
-    <!-- RIGHT: pitch -->
-    <section class="pitch-col">
-      <div class="pitch" id="pitch">
-        <div class="pitch-lines">
-          <div class="pl-box pl-box-top"></div>
-          <div class="pl-box pl-box-bottom"></div>
-          <div class="pl-circle"></div>
-          <div class="pl-halfway"></div>
-          <div class="pl-spot pl-spot-top"></div>
-          <div class="pl-spot pl-spot-bottom"></div>
-        </div>
-        <!-- slot nodes injected by JS -->
-      </div>
-      <div class="formation-tag" id="formationTag">4-3-3</div>
-    </section>
+      <p class="hand-hint" id="handHint">Spin to deal a festival, then place an act on a day.</p>
+    </div>
   </main>
 
   <!-- RESULTS SCREEN -->
